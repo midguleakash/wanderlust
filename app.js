@@ -27,7 +27,7 @@ const MONGO_URL= "mongodb://127.0.0.1:27017/wanderlust2";
 const dbUrl = process.env.ATLASDB_URL
 
 async function main() {
-    await mongoose.connect(dbUrl)
+    await mongoose.connect(MONGO_URL)
 }
 
 main()
@@ -47,7 +47,7 @@ app.engine("ejs" , ejsMate);
 app.use(express.static(path.join(__dirname, "/public")));
 
 const store = MongoStore.create({
-    mongoUrl: dbUrl,
+    mongoUrl: MONGO_URL,
     crypto:{
         secret:process.env.SECRET
     },
