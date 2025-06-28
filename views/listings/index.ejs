@@ -33,12 +33,18 @@
     .tax-toggle {
       border: 1px solid black;
       border-radius: 1rem;
+      width: 20rem;
       height: 3.2rem;
       padding: 1rem;
-      margin-left: 5rem;
+      margin-left: 1rem;
       margin-right: 3rem;
       display: flex;
       align-items: center;
+    }
+
+    .filter-toggle{
+      display: flex;
+      display: inline-block;
     }
   </style>
 
@@ -51,7 +57,7 @@
     <i class="fa-solid fa-sliders"></i> Filters
   </button>
 
-  <div id="filterCollapse" class="collapse d-lg-block">
+  <div id="filterCollapse" class="collapse d-lg-block filter-toggle">
     <div id="filters">
       <div class="filter">
         <div><i class="fa-solid fa-fire"></i></div>
@@ -99,7 +105,7 @@
       </div>
     </div>
 
-    <div class="tax-toggle ms-auto">
+    <div class="tax-toggle me-auto mt-2 mb-2">
       <div class="form-check-reverse form-switch">
         <input
           class="form-check-input"
