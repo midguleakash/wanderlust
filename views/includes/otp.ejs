@@ -1,0 +1,172 @@
+<div class="mb-3">
+    <button
+        type="button"
+        class="btn btn-primary"
+        id="generateOtpBtn"
+    >
+        Generate OTP
+    </button>
+</div>
+
+<div
+    id="otpSection"
+    style="display: none;"
+    class="mt-3"
+>
+    <div class="mb-3">
+
+        <label for="otp" class="form-label">
+            Enter OTP
+        </label>
+
+        <input
+            type="text"
+            id="otp"
+            class="form-control"
+            placeholder="Enter 6 digit OTP"
+            maxlength="6"
+        >
+
+    </div>
+
+    <button
+        type="button"
+        class="btn btn-warning"
+        id="verifyOtpBtn"
+    >
+        Verify OTP
+    </button>
+
+    
+</div>
+
+<div id="otpMessage" class="mt-2"></div>
+
+<script>
+const generateOtpBtn =
+    document.getElementById("generateOtpBtn");
+
+const otpSection =
+    document.getElementById("otpSection");
+
+const verifyOtpBtn =
+    document.getElementById("verifyOtpBtn");
+
+const otpMessage =
+    document.getElementById("otpMessage");
+
+
+generateOtpBtn.addEventListener("click", async () => {
+    
+    const email =
+        document.getElementById("email").value;
+    
+    if (!email) {
+        otpMessage.innerHTML = `
+            <span class="text-danger">
+                Please enter email first.
+            </span>
+        `;
+        return;
+    }
+
+    const response = await fetch("/generate-otp", {
+        method: "POST",
+
+        headers: {
+            "Content-Type": "application/json"
+        },
+
+        body: JSON.stringify({
+            email: email
+        })
+    });
+
+    const data = await response.json();
+
+    if (data.success) {
+
+        otpSection.style.display = "block";
+
+        generateOtpBtn.disabled = true;
+
+        otpMessage.innerHTML = `
+            <span class="text-success">
+                OTP sent to your email.
+            </span>
+        `;
+
+    } else {
+
+        otpMessage.innerHTML = `
+            <span class="text-danger">
+                ${data.message}
+            </span>
+        `;
+    }
+});
+
+
+verifyOtpBtn.addEventListener("click", async () => {
+
+    const email =
+        document.getElementById("email").value;
+
+    const otp =
+        document.getElementById("otp").value;
+
+    if (!/^[0-9]{6}$/.test(otp)) {
+
+        otpMessage.innerHTML = `
+            <span class="text-danger">
+                Enter valid 6 digit OTP.
+            </span>
+        `;
+
+        return;
+    }
+
+    const response = await fetch("/verify-otp", {
+
+        method: "POST",
+
+        headers: {
+            "Content-Type": "application/json"
+        },
+
+        body: JSON.stringify({
+            email,
+            otp
+        })
+    });
+
+    const data = await response.json();
+
+    if (data.success) {
+
+        otpMessage.innerHTML = `
+            <span class="text-success">
+                Email verified successfully!
+            </span>
+        `;
+
+        verifyOtpBtn.disabled = true;
+
+        // If signup page
+        const signupBtn =
+            document.getElementById("signupBtn");
+
+        if (signupBtn) {
+            signupBtn.disabled = false;
+        }
+
+    } else {
+
+        otpMessage.innerHTML = `
+            <span class="text-danger">
+                ${data.message}
+            </span>
+        `;
+    }
+});
+</script>

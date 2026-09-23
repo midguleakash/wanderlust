@@ -27,7 +27,7 @@ const MONGO_URL= "mongodb://127.0.0.1:27017/wanderlust2";
 const dbUrl = process.env.ATLASDB_URL
 
 async function main() {
-    await mongoose.connect(dbUrl)
+    await mongoose.connect(MONGO_URL)
 }
 
 main()
@@ -40,7 +40,8 @@ main()
 
 
 app.set("view engine" , "ejs");
-app.set("views", path.join(__dirname, "views"));    
+app.set("views", path.join(__dirname, "views"));   
+app.use(express.json()); 
 app.use(express.urlencoded({extended:true})); 
 app.use(methodOverride("_method"));
 app.engine("ejs" , ejsMate);
@@ -64,7 +65,7 @@ const sessionOptions = {
     secret: process.env.SECRET,
     resave: false,
     saveUninitialized: true,
-    Cookie: {
+    cookie: {
         expires: Date.now() + 7 * 24 * 60 * 60 * 1000 ,
         maxAge: 7 * 24 * 60 * 60 * 1000 ,
         httpOnly: true

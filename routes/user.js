@@ -12,6 +12,18 @@ router
   .get(userController.signupForm)
   .post(wrapAsync(userController.signUp));
 
+// Generate OTP
+router.post(
+  "/generate-otp",
+  wrapAsync(userController.generateOTP)
+); 
+
+// Verify OTP
+router.post(
+  "/verify-otp",
+  wrapAsync(userController.verifyOTP)
+);
+
 router
   .route("/login")
   .get(userController.loginForm)
