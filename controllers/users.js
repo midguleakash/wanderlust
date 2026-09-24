@@ -22,9 +22,19 @@ module.exports.signupForm = (req, res) => {
   res.render("users/signup.ejs");
 };
 
-module.exports.signUp = async (req, res) => {
+module.exports.signUp = async (req, res, next) => {
   try {
     let { username, email, password, role } = req.body;
+    email = email.trim().toLowerCase();
+
+    // OTP verification check
+    if (req.session.emailVerified !== email) {
+      req.flash(
+        "error",
+        "Please verify your email before creating an account."
+      );
+      return res.redirect("/signup");
+    }
 
     // Public signup only allows guest or host
     if (!["guest", "host"].includes(role)) {
@@ -60,6 +70,9 @@ module.exports.signUp = async (req, res) => {
       if (err) {
         return next();
       }
+
+      delete req.session.emailVerified;
+      
       if (role === "host") {
         req.flash(
           "success",
@@ -140,6 +153,7 @@ module.exports.generateOTP = async (req, res) => {
 
     // Generate OTP
     const otp = generateOTP();
+    console.log(otp);
     const otpHash = hashOTP(otp);
     
 
@@ -177,7 +191,7 @@ module.exports.generateOTP = async (req, res) => {
 
     res.json({
       success: true,
-      message: "OTP sent successfully!"
+      message: "OTP sent. Please check your email.!"
     });
 
   } catch (error) {
@@ -194,60 +208,68 @@ module.exports.generateOTP = async (req, res) => {
 
 
 module.exports.verifyOTP = async (req, res) => {
-  try {
+    
 
-    const { email, otp } = req.body;
+    try {
+        
+        const { otp } = req.body;
+        const email = req.body.email.trim().toLowerCase();
 
-    const otpRecord = await OTP.findOne({ email });
+        console.log(email, otp);
 
-    if (!otpRecord) {
-      return res.json({
-        success: false,
-        message: "OTP not found. Please generate OTP again."
-      });
+        const otpRecord = await OTP.findOne({ email });
+
+        if (!otpRecord) {
+            return res.json({
+                success: false,
+                message: "OTP not found. Please generate OTP again."
+            });
+        }
+
+        // Check expiry
+        if (otpRecord.expiresAt < new Date()) {
+
+            await OTP.deleteOne({
+                _id: otpRecord._id
+            });
+
+            return res.json({
+                success: false,
+                message: "OTP expired. Please generate a new OTP."
+            });
+        }
+
+        // Hash entered OTP
+        const otpHash = hashOTP(otp);
+
+        // Compare hashed OTP
+        if (otpRecord.otpHash !== otpHash) {
+            return res.json({
+                success: false,
+                message: "Invalid OTP!"
+            });
+        }
+
+        // Correct OTP → delete OTP
+        await OTP.deleteOne({
+            _id: otpRecord._id
+        });
+
+        // Mark email as verified
+        req.session.emailVerified = email;
+
+        res.json({
+            success: true,
+            message: "Email verified successfully!"
+        });
+
+    } catch (error) {
+
+        console.log(error);
+
+        res.json({
+            success: false,
+            message: "Something went wrong!"
+        });
     }
-
-    // Check expiry
-    if (otpRecord.expiresAt < new Date()) {
-
-      await OTP.deleteOne({
-        _id: otpRecord._id
-      });
-
-      return res.json({
-        success: false,
-        message: "OTP expired. Please generate a new OTP."
-      });
-    }
-
-    // Check OTP
-    if (otpRecord.otp !== otp) {
-      return res.json({
-        success: false,
-        message: "Invalid OTP!"
-      });
-    }
-
-    // Correct OTP
-    await OTP.deleteOne({
-      _id: otpRecord._id
-    });
-
-    // Mark email verified in session
-    req.session.emailVerified = email;
-
-    res.json({
-      success: true,
-      message: "Email verified successfully!"
-    });
-
-  } catch (error) {
-
-    console.log(error);
-
-    res.json({
-      success: false,
-      message: "Something went wrong!"
-    });
-  }
 };
