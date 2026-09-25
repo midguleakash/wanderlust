@@ -272,4 +272,23 @@ module.exports.verifyOTP = async (req, res) => {
             message: "Something went wrong!"
         });
     }
+
+    
+};
+
+module.exports.profile = async (req, res, next) => {
+
+    try {
+
+      console.log("profile controller me aya");
+
+        // res.render("users/profile", {
+        //     user: req.user
+        // });
+      
+    } catch (err) {
+
+        next(err);
+
+    }
 };

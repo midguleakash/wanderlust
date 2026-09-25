@@ -19,6 +19,8 @@ const User = require("./models/user.js");
 const listingRouter = require("./routes/listing.js");
 const reviewRouter = require("./routes/review.js");
 const userRouter = require("./routes/user.js");
+const hostRouter = require("./routes/host");
+const adminRouter = require("./routes/admin");
 
 
 
@@ -101,6 +103,8 @@ app.use( (req, res, next) => {
 app.use("/listings" , listingRouter);
 app.use("/listings/:id/reviews" , reviewRouter);
 app.use("/" , userRouter);
+app.use("/host", hostRouter);
+app.use("/admin", adminRouter);
 
 
 

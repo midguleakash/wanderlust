@@ -1,0 +1,105 @@
+<% layout("/layouts/boilerplate.ejs") %>
+
+<div class="container mt-4 p-2">
+
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h2>Host Dashboard</h2>
+            <p class="text-muted">
+                Welcome, <%=  %>
+            </p>
+        </div>
+
+        <a href="/listings/new" class="btn btn-success">
+            + Add New Listing
+        </a>
+    </div>
+
+    <!-- Statistics -->
+
+    <div class="row g-3 mb-4 "> 
+
+        <div class="col-md-4">
+            <div class="card shadow-sm">
+                <div class="card-body">
+                    <h6 class="text-muted  p-2">My Listings</h6>
+                    <h2 class="ps-2"><%= listingCount %></h2>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-4">
+            <div class="card shadow-sm">
+                <div class="card-body">
+                    <h6 class="text-muted p-2">Total Bookings</h6>
+                    <h2 class="ps-2"><%= bookingCount %></h2>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-4">
+            <div class="card shadow-sm">
+                <div class="card-body">
+                    <h6 class="text-muted p-2">Total Earnings</h6>
+                    <h2 class="ps-2">₹<%= totalEarnings %></h2>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+
+    <!-- Host Actions -->
+
+    <div class="row g-3">
+
+        <div class="col-md-4">
+            <div class="card shadow-sm h-100">
+                <div class="card-body">
+                    <h5 class="ps-2 pt-2">My Listings</h5>
+                    <p class="text-muted p-2">
+                        View and manage your properties.
+                    </p>
+
+                    <a href="/host/listings" class="btn btn-primary ms-2 mb-2">
+                        Manage Listings
+                    </a>
+                </div>
+            </div>
+        </div>
+
+
+        <div class="col-md-4">
+            <div class="card shadow-sm h-100">
+                <div class="card-body">
+                    <h5 class="ps-2 pt-2">Bookings</h5>
+                    <p class="text-muted p-2">
+                        View bookings made for your properties.
+                    </p>
+
+                    <a href="/host/bookings" class="btn btn-primary ms-2 mb-2">
+                        View Bookings
+                    </a>
+                </div>
+            </div>
+        </div>
+
+
+        <div class="col-md-4">
+            <div class="card shadow-sm h-100">
+                <div class="card-body">
+                    <h5 class="ps-2 pt-2">Profile</h5>
+                    <p class="text-muted p-2">
+                        Manage your host profile.
+                    </p>
+
+                    <a href="/profile" class="btn btn-secondary ms-2 mb-2">
+                        My Profile
+                    </a>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+</div>

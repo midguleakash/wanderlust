@@ -6,6 +6,7 @@ const User = require("../models/user.js");
 const passport = require("passport");
 const { saveRedirectUrl } = require("../middleware.js");
 const userController = require("../controllers/users.js");
+const { isLoggedIn, isOwner, validateListing } = require("../middleware.js");
 
 router
   .route("/signup")
@@ -37,5 +38,12 @@ router
   );
 
 router.get("/logout", userController.logout);
+
+// Profile
+router.get(
+    "/profile",
+    // isLoggedIn,
+    userController.profile
+);
 
 module.exports = router;
