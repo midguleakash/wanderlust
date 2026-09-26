@@ -1,0 +1,240 @@
+<% layout("/layouts/boilerplate.ejs") %>
+
+<div class="container mt-4">
+
+    <!-- Header -->
+    <div class="mb-4">
+        <h2>User Details</h2>
+        <p class="text-muted">
+            View registered user information.
+        </p>
+    </div>
+
+
+    <div class="card shadow-sm">
+
+        <div class="card-body p-2">
+
+            <h5 class="mb-4">
+                Account Information
+            </h5>
+
+
+            <!-- Username -->
+            <div class="row mb-3">
+                <div class="col-md-4 fw-semibold">
+                    Username
+                </div>
+
+                <div class="col-md-8">
+                    <%= user.username %>
+                </div>
+            </div>
+
+
+            <!-- Email -->
+            <div class="row mb-3">
+                <div class="col-md-4 fw-semibold">
+                    Email
+                </div>
+
+                <div class="col-md-8">
+                    <%= user.email %>
+                </div>
+            </div>
+
+
+            <!-- Role -->
+            <div class="row mb-3">
+                <div class="col-md-4 fw-semibold">
+                    Role
+                </div>
+
+                <div class="col-md-8">
+
+                    <% if (user.role === "guest") { %>
+
+                        <span class="badge bg-primary">
+                            Guest
+                        </span>
+
+                    <% } else if (user.role === "host") { %>
+
+                        <span class="badge bg-info text-dark">
+                            Host
+                        </span>
+
+                    <% } else if (user.role === "admin") { %>
+
+                        <span class="badge bg-dark">
+                            Admin
+                        </span>
+
+                    <% } %>
+
+                </div>
+            </div>
+
+
+            <!-- Email Verification -->
+            <div class="row mb-3">
+                <div class="col-md-4 fw-semibold">
+                    Email Verification
+                </div>
+
+                <div class="col-md-8">
+
+                    <% if (user.isVerified) { %>
+
+                        <span class="badge bg-success">
+                            Verified
+                        </span>
+
+                    <% } else { %>
+
+                        <span class="badge bg-secondary">
+                            Not Verified
+                        </span>
+
+                    <% } %>
+
+                </div>
+            </div>
+
+
+            <!-- Account Status -->
+            <div class="row mb-3">
+                <div class="col-md-4 fw-semibold">
+                    Account Status
+                </div>
+
+                <div class="col-md-8">
+
+                    <% if (user.isBlocked) { %>
+
+                        <span class="badge bg-danger">
+                            Blocked
+                        </span>
+
+                    <% } else { %>
+
+                        <span class="badge bg-success">
+                            Active
+                        </span>
+
+                    <% } %>
+
+                </div>
+            </div>
+
+
+            <!-- Host Status -->
+            <% if (user.role === "host") { %>
+
+                <div class="row mb-3">
+
+                    <div class="col-md-4 fw-semibold">
+                        Host Status
+                    </div>
+
+                    <div class="col-md-8">
+
+                        <% if (user.hostStatus === "pending") { %>
+
+                            <span class="badge bg-warning text-dark">
+                                Pending
+                            </span>
+
+                        <% } else if (user.hostStatus === "approved") { %>
+
+                            <span class="badge bg-success">
+                                Approved
+                            </span>
+
+                        <% } else if (user.hostStatus === "rejected") { %>
+
+                            <span class="badge bg-danger">
+                                Rejected
+                            </span>
+
+                        <% } %>
+
+                    </div>
+
+                </div>
+
+            <% } %>
+
+
+            <!-- Registered Date -->
+            <div class="row mb-4">
+
+                <div class="col-md-4 fw-semibold">
+                    Registered On
+                </div>
+
+                <div class="col-md-8">
+                    <%= user._id.getTimestamp().toLocaleDateString() %>
+                </div>
+
+            </div>
+
+
+            <!-- Actions -->
+            <div class="mt-4">
+
+                <a
+                    href="/admin/users"
+                    class="btn btn-secondary"
+                >
+                    Back to Users
+                </a>
+
+
+                <% if (user.role !== "admin") { %>
+
+                    <% if (user.isBlocked) { %>
+
+                        <form
+                            action="/admin/users/<%= user._id %>/unblock?_method=PATCH"
+                            method="POST"
+                            class="d-inline"
+                        >
+
+                            <button
+                                type="submit"
+                                class="btn btn-success"
+                            >
+                                Unblock User
+                            </button>
+
+                        </form>
+
+                    <% } else { %>
+
+                        <form
+                            action="/admin/users/<%= user._id %>/block?_method=PATCH"
+                            method="POST"
+                            class="d-inline"
+                        >
+
+                            <button
+                                type="submit"
+                                class="btn btn-danger"
+                            >
+                                Block User
+                            </button>
+
+                        </form>
+
+                    <% } %>
+
+                <% } %>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>

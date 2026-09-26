@@ -1,0 +1,195 @@
+<% layout("/layouts/boilerplate.ejs") %>
+
+<div class="container mt-4">
+
+    <div class="mb-4">
+        <h2>Host Approval</h2>
+
+        <p class="text-muted">
+            Review and approve host registrations.
+        </p>
+    </div>
+
+
+    <div class="card shadow-sm">
+
+        <div class="card-body">
+
+            <h5 class="mb-3 p-2">Registered Hosts</h5>
+
+            <div class="table-responsive">
+
+                <table class="table table-bordered table-hover align-middle">
+
+                    <thead>
+                        <tr>
+                            <th>Host</th>
+                            <th>Email</th>
+                            <th>Email Verification</th>
+                            <th>Status</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+
+                    <tbody>
+
+                        <% hosts.forEach(host => { %>
+
+                            <tr>
+
+                                <!-- Host -->
+                                <td>
+                                    <%= host.username %>
+                                </td>
+
+
+                                <!-- Email -->
+                                <td>
+                                    <%= host.email %>
+                                </td>
+
+
+                                <!-- Email Verification -->
+                                <td>
+
+                                    <% if (host.isVerified) { %>
+
+                                        <span class="badge bg-success">
+                                            Verified
+                                        </span>
+
+                                    <% } else { %>
+
+                                        <span class="badge bg-secondary">
+                                            Not Verified
+                                        </span>
+
+                                    <% } %>
+
+                                </td>
+
+
+                                <!-- Status -->
+                                <td>
+
+                                    <% if (host.hostStatus === "pending") { %>
+
+                                        <span class="badge bg-warning text-dark">
+                                            Pending
+                                        </span>
+
+                                    <% } else if (host.hostStatus === "approved") { %>
+
+                                        <span class="badge bg-success">
+                                            Approved
+                                        </span>
+
+                                    <% } else if (host.hostStatus === "rejected") { %>
+
+                                        <span class="badge bg-danger">
+                                            Rejected
+                                        </span>
+
+                                    <% } %>
+
+                                </td>
+
+
+                                <!-- Action -->
+                                <td>
+
+                                    <% if (host.hostStatus === "pending") { %>
+
+                                        <form
+                                            action="/admin/hosts/<%= host._id %>/approve?_method=PATCH"
+                                            method="POST"
+                                            class="d-inline"
+                                        >
+
+                                            <input
+                                                type="hidden"
+                                                name="_method"
+                                                value="PATCH"
+                                            >
+
+                                            <button
+                                                type="submit"
+                                                class="btn btn-success btn-sm"
+                                            >
+                                                Approve
+                                            </button>
+
+                                        </form>
+
+
+                                        <form
+                                            action="/admin/hosts/<%= host._id %>/reject?_method=PATCH"
+                                            method="POST"
+                                            class="d-inline"
+                                        >
+
+                                            <input
+                                                type="hidden"
+                                                name="_method"
+                                                value="PATCH"
+                                            >
+
+                                            <button
+                                                type="submit"
+                                                class="btn btn-danger btn-sm"
+                                            >
+                                                Reject
+                                            </button>
+
+                                        </form>
+
+
+                                    <% } else if (host.hostStatus === "approved") { %>
+
+                                        <span class="text-success">
+                                            Approved
+                                        </span>
+
+
+                                    <% } else if (host.hostStatus === "rejected") { %>
+
+                                        <form
+                                            action="/admin/hosts/<%= host._id %>/approve?_method=PATCH"
+                                            method="POST"
+                                            class="d-inline"
+                                        >
+
+                                            <input
+                                                type="hidden"
+                                                name="_method"
+                                                value="PATCH"
+                                            >
+
+                                            <button
+                                                type="submit"
+                                                class="btn btn-success btn-sm"
+                                            >
+                                                Approve
+                                            </button>
+
+                                        </form>
+
+                                    <% } %>
+
+                                </td>
+
+                            </tr>
+
+                        <% }) %>
+
+                    </tbody>
+
+                </table>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>

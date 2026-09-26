@@ -1,124 +1,145 @@
 <% layout("/layouts/boilerplate.ejs") %>
 
-<div class="container mt-4">
+    <div class="container mt-4">
 
-    <div class="mb-4">
-        <h2>Admin Dashboard</h2>
-        <p class="text-muted">
-            Welcome, <%=  %>
-        </p>
+        <div class="mb-4">
+            <h2>Admin Dashboard</h2>
+            <p class="text-muted">
+                Welcome, <%= %>
+            </p>
+        </div>
+
+
+        <!-- Statistics -->
+
+        <div class="row g-3 mb-4">
+
+            <div class="col-md-3">
+                <div class="card shadow-sm">
+                    <div class="card-body m-2">
+                        <h6 class="text-muted">Total Users</h6>
+                        <h2>
+                            <%= totalUsers %>
+                        </h2>
+                    </div>
+                </div>
+            </div>
+
+
+            <div class="col-md-3">
+                <div class="card shadow-sm">
+                    <div class="card-body m-2">
+                        <h6 class="text-muted">Total Hosts</h6>
+                        <h2>
+                            <%= totalHosts %>
+                        </h2>
+                    </div>
+                </div>
+            </div>
+
+
+            <div class="col-md-3">
+                <div class="card shadow-sm">
+                    <div class="card-body m-2">
+                        <h6 class="text-muted">Pending Hosts</h6>
+                        <h2>
+                            <%= pendingHosts %>
+                        </h2>
+                    </div>
+                </div>
+            </div>
+
+
+            <div class="col-md-3">
+                <div class="card shadow-sm">
+                    <div class="card-body m-2">
+                        <h6 class="text-muted">Total Listings</h6>
+                        <h2>
+                            <%= totalListings %>
+                        </h2>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+
+        <!-- Admin Actions -->
+
+        <div class="row g-3">
+
+            <div class="col-md-3">
+                <div class="card shadow-sm h-100">
+                    <div class="card-body m-2">
+
+                        <h5>Manage Users</h5>
+
+                        <p class="text-muted">
+                            View and manage all registered users.
+                        </p>
+
+                        <a href="/admin/users" class="btn btn-primary mt-4">
+                            View Users
+                        </a>
+
+                    </div>
+                </div>
+            </div>
+
+
+            <div class="col-md-3">
+                <div class="card shadow-sm h-100">
+                    <div class="card-body m-2">
+
+                        <h5>Host Approval</h5>
+
+                        <p class="text-muted">
+                            Review and approve host registrations.
+                        </p>
+
+                        <a href="/admin/hosts" class="btn btn-warning">
+                            Manage Hosts
+                        </a>
+
+                    </div>
+                </div>
+            </div>
+
+
+            <div class="col-md-3">
+                <div class="card shadow-sm h-100">
+                    <div class="card-body m-2">
+
+                        <h5>Manage Listings</h5>
+
+                        <p class="text-muted">
+                            View and manage platform listings.
+                        </p>
+
+                        <a href="/admin/listings" class="btn btn-primary mt-4">
+                            View Listings
+                        </a>
+
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-3">
+                <div class="card shadow-sm h-100">
+                    <div class="card-body m-2">
+                        <h5>Manage Admins</h5>
+
+                        <p class="text-muted">
+                            Add and manage administrator accounts.
+                        </p>
+
+                        <a href="/admin/admins" class="btn btn-danger">
+                            Manage Admins
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
     </div>
-
-
-    <!-- Statistics -->
-
-    <div class="row g-3 mb-4">
-
-        <div class="col-md-3">
-            <div class="card shadow-sm">
-                <div class="card-body m-2">
-                    <h6 class="text-muted">Total Users</h6>
-                    <h2><%= totalUsers %></h2>
-                </div>
-            </div>
-        </div>
-
-
-        <div class="col-md-3">
-            <div class="card shadow-sm">
-                <div class="card-body m-2">
-                    <h6 class="text-muted">Total Hosts</h6>
-                    <h2><%= totalHosts %></h2>
-                </div>
-            </div>
-        </div>
-
-
-        <div class="col-md-3">
-            <div class="card shadow-sm">
-                <div class="card-body m-2">
-                    <h6 class="text-muted">Pending Hosts</h6>
-                    <h2><%= pendingHosts %></h2>
-                </div>
-            </div>
-        </div>
-
-
-        <div class="col-md-3">
-            <div class="card shadow-sm">
-                <div class="card-body m-2">
-                    <h6 class="text-muted">Total Listings</h6>
-                    <h2><%= totalListings %></h2>
-                </div>
-            </div>
-        </div>
-
-    </div>
-
-
-    <!-- Admin Actions -->
-
-    <div class="row g-3">
-
-        <div class="col-md-4">
-            <div class="card shadow-sm h-100">
-                <div class="card-body m-2">
-
-                    <h5>Manage Users</h5>
-
-                    <p class="text-muted">
-                        View and manage all registered users.
-                    </p>
-
-                    <a href="/admin/users"
-                       class="btn btn-primary">
-                        View Users
-                    </a>
-
-                </div>
-            </div>
-        </div>
-
-
-        <div class="col-md-4">
-            <div class="card shadow-sm h-100">
-                <div class="card-body m-2">
-
-                    <h5>Host Approval</h5>
-
-                    <p class="text-muted">
-                        Review and approve host registrations.
-                    </p>
-
-                    <a href="/admin/hosts"
-                       class="btn btn-warning">
-                        Manage Hosts
-                    </a>
-
-                </div>
-            </div>
-        </div>
-
-
-        <div class="col-md-4">
-            <div class="card shadow-sm h-100">
-                <div class="card-body m-2">
-
-                    <h5>Manage Listings</h5>
-
-                    <p class="text-muted">
-                        View and manage platform listings.
-                    </p>
-
-                    <a href="/admin/listings"
-                       class="btn btn-primary">
-                        View Listings
-                    </a>
-
-                </div>
-            </div>
-        </div>
-
-    </div>
-
-</div>

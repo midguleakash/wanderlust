@@ -20,7 +20,19 @@ const userSchema = new Schema({
         default: false
     },
 
+    hostStatus: {
+        type: String,
+        enum: ["pending", "approved", "rejected"],
+        default: "pending"
+    },
+
     isVerified: {
+        type: Boolean,
+        default: false
+    },
+
+    // Account block status
+    isBlocked: {
         type: Boolean,
         default: false
     }

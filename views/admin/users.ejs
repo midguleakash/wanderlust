@@ -1,0 +1,321 @@
+<% layout("/layouts/boilerplate.ejs") %>
+
+    <div class="container mt-4">
+
+        <!-- Header -->
+        <div class="mb-4">
+            <h2>Manage Users</h2>
+            <p class="text-muted">
+                View and manage all registered users.
+            </p>
+        </div>
+
+
+        <!-- Search & Filters -->
+        <div class="card shadow-sm mb-4">
+            <div class="card-body">
+
+                <form action="/admin/users" method="GET">
+
+                    <div class="row g-2">
+
+                        <!-- Search -->
+                        <div class="col-md-5">
+                            <input type="text" name="search" class="form-control" placeholder="Search User..."
+                                value="<%= search %>">
+                        </div>
+
+
+                        <!-- Role -->
+                        <div class="col-md-3">
+                            <select name="role" class="form-select">
+
+                                <option value="">
+                                    All Roles
+                                </option>
+
+                                <option value="guest" <%=selectedRole==="guest" ? "selected" : "" %>
+                                    >
+                                    Guest
+                                </option>
+
+                                <option value="host" <%=selectedRole==="host" ? "selected" : "" %>
+                                    >
+                                    Host
+                                </option>
+
+                                <option value="admin" <%=selectedRole==="admin" ? "selected" : "" %>
+                                    >
+                                    Admin
+                                </option>
+
+                            </select>
+                        </div>
+
+
+                        <!-- Status -->
+                        <div class="col-md-3">
+                            <select name="status" class="form-select">
+
+                                <option value="">
+                                    All Status
+                                </option>
+
+                                <option value="verified" <%=selectedStatus==="verified" ? "selected" : "" %>
+                                    >
+                                    Verified
+                                </option>
+
+                                <option value="notVerified" <%=selectedStatus==="notVerified" ? "selected" : "" %>
+                                    >
+                                    Not Verified
+                                </option>
+
+                                <option value="pending" <%=selectedStatus==="pending" ? "selected" : "" %>
+                                    >
+                                    Pending
+                                </option>
+
+                                <option value="approved" <%=selectedStatus==="approved" ? "selected" : "" %>
+                                    >
+                                    Approved
+                                </option>
+
+                                <option value="rejected" <%=selectedStatus==="rejected" ? "selected" : "" %>
+                                    >
+                                    Rejected
+                                </option>
+
+                            </select>
+                        </div>
+
+
+                        <!-- Search Button -->
+                        <div class="col-md-1">
+                            <button type="submit" class="btn btn-primary w-100">
+                                Search
+                            </button>
+                        </div>
+
+                    </div>
+
+                </form>
+
+            </div>
+        </div>
+
+
+        <!-- Users Table -->
+        <div class="card shadow-sm">
+
+            <div class="card-body">
+
+                <h5 class="mb-3 p-2">
+                    Registered Users
+                </h5>
+
+                <div class="table-responsive">
+
+                    <table class="table table-bordered table-hover align-middle">
+
+                        <thead>
+                            <tr>
+                                <th>Username</th>
+                                <th>Email</th>
+                                <th>Role</th>
+                                <th>Verification</th>
+                                <th>Host Status</th>
+                                <th>Account Status</th>
+                                <th>Registered</th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+
+
+                        <tbody>
+
+                            <% if (users.length===0) { %>
+
+                                <tr>
+                                    <td colspan="8" class="text-center text-muted">
+                                        No users found.
+                                    </td>
+                                </tr>
+
+                                <% } %>
+
+
+                                    <% users.forEach(user=> { %>
+
+                                        <tr>
+
+                                            <!-- Username -->
+                                            <td>
+                                                <%= user.username %>
+                                            </td>
+
+
+                                            <!-- Email -->
+                                            <td>
+                                                <%= user.email %>
+                                            </td>
+
+
+                                            <!-- Role -->
+                                            <td>
+
+                                                <% if (user.role==="guest" ) { %>
+
+                                                    <span class="badge bg-primary">
+                                                        Guest
+                                                    </span>
+
+                                                    <% } else if (user.role==="host" ) { %>
+
+                                                        <span class="badge bg-info text-dark">
+                                                            Host
+                                                        </span>
+
+                                                        <% } else if (user.role==="admin" ) { %>
+
+                                                            <span class="badge bg-dark">
+                                                                Admin
+                                                            </span>
+
+                                                            <% } %>
+
+                                            </td>
+
+
+                                            <!-- Verification -->
+                                            <td>
+
+                                                <% if (user.isVerified) { %>
+
+                                                    <span class="badge bg-success">
+                                                        Verified
+                                                    </span>
+
+                                                    <% } else { %>
+
+                                                        <span class="badge bg-secondary">
+                                                            Not Verified
+                                                        </span>
+
+                                                        <% } %>
+
+                                            </td>
+
+
+                                            <!-- Host Status -->
+                                            <td>
+
+                                                <% if (user.role==="host" ) { %>
+
+                                                    <% if (user.hostStatus==="pending" ) { %>
+
+                                                        <span class="badge bg-warning text-dark">
+                                                            Pending
+                                                        </span>
+
+                                                        <% } else if (user.hostStatus==="approved" ) { %>
+
+                                                            <span class="badge bg-success">
+                                                                Approved
+                                                            </span>
+
+                                                            <% } else if (user.hostStatus==="rejected" ) { %>
+
+                                                                <span class="badge bg-danger">
+                                                                    Rejected
+                                                                </span>
+
+                                                                <% } %>
+
+                                                                    <% } else { %>
+
+                                                                        <span class="text-muted">
+                                                                            -
+                                                                        </span>
+
+                                                                        <% } %>
+
+                                            </td>
+
+
+                                            <!-- Account Status -->
+                                            <td>
+
+                                                <% if (user.isBlocked) { %>
+
+                                                    <span class="badge bg-danger">
+                                                        Blocked
+                                                    </span>
+
+                                                    <% } else { %>
+
+                                                        <span class="badge bg-success">
+                                                            Active
+                                                        </span>
+
+                                                        <% } %>
+
+                                            </td>
+
+
+                                            <!-- Registered Date -->
+                                            <td>
+                                                <%= user._id.getTimestamp().toLocaleDateString() %>
+                                            </td>
+
+
+                                            <!-- Action -->
+                                            <td>
+
+                                                <a href="/admin/users/<%= user._id %>" class="btn btn-primary btn-sm">
+                                                    View
+                                                </a>
+
+                                                <% if (user.role !=="admin" ) { %>
+
+                                                    <% if (user.isBlocked) { %>
+
+                                                        <form
+                                                            action="/admin/users/<%= user._id %>/unblock?_method=PATCH"
+                                                            method="POST" class="d-inline">
+                                                            <button type="submit" class="btn btn-success btn-sm">
+                                                                Unblock
+                                                            </button>
+                                                        </form>
+
+                                                        <% } else { %>
+
+                                                            <form
+                                                                action="/admin/users/<%= user._id %>/block?_method=PATCH"
+                                                                method="POST" class="d-inline">
+                                                                <button type="submit" class="btn btn-danger btn-sm">
+                                                                    Block
+                                                                </button>
+                                                            </form>
+
+                                                            <% } %>
+
+                                                                <% } %>
+
+                                            </td>
+
+                                        </tr>
+
+                                        <% }) %>
+
+                        </tbody>
+
+                    </table>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>

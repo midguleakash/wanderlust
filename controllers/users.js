@@ -4,19 +4,9 @@ const crypto = require("crypto");
 const passport = require("passport");
 const { saveRedirectUrl } = require("../middleware.js");
 
-
 const OTP = require("../models/otp.js");
-
-
-
-const {
-  generateOTP,
-  hashOTP
-} = require("../utils/otpGenerator.js");
-
-const {
-  sendEmail
-} = require("../services/emailService.js");
+const { generateOTP, hashOTP } = require("../utils/otpGenerator.js");
+const { sendEmail } = require("../services/emailService.js");
 
 module.exports.signupForm = (req, res) => {
   res.render("users/signup.ejs");
@@ -63,7 +53,7 @@ module.exports.signUp = async (req, res, next) => {
 
 
 
-    const newUser = new User({ email, username, role });
+    const newUser = new User({ email, username, role, isVerified: true });
     const registeredUser = await User.register(newUser, password);
 
     req.login(registeredUser, (err) => {
@@ -72,19 +62,23 @@ module.exports.signUp = async (req, res, next) => {
       }
 
       delete req.session.emailVerified;
-      
+
+      // Role-based redirect
+      if (role === "guest") {
+        req.flash("success", "Welcome to Wanderlust!");
+        return res.redirect("/listings");
+      }
+
       if (role === "host") {
         req.flash(
           "success",
           "Registration successful! Wait for admin approval."
         );
-      } else {
-        req.flash(
-          "success",
-          "Welcome to Wanderlust!"
-        );
+        return res.redirect("/host/dashboard");
       }
-      res.redirect("/listings");
+
+      // Safety fallback
+      return res.redirect("/listings");
     });
   } catch (e) {
 
@@ -112,9 +106,25 @@ module.exports.loginForm = (req, res) => {
 };
 
 module.exports.login = async (req, res) => {
-  req.flash("success", "login successfully");
-  let redirectUrl = res.locals.redirectUrl || "/listings";
-  res.redirect(redirectUrl);
+
+    req.flash("success", "Login successful!");
+
+    // Guest
+    if (req.user.role === "guest") {
+        return res.redirect(res.locals.redirectUrl || "/listings");
+    }
+
+    // Host
+    if (req.user.role === "host") {
+        return res.redirect("/host/dashboard");
+    }
+
+    // Admin
+    if (req.user.role === "admin") {
+        return res.redirect("/admin/dashboard");
+    }
+
+    return res.redirect("/listings");
 };
 
 module.exports.logout = (req, res, next) => {
@@ -130,7 +140,7 @@ module.exports.logout = (req, res, next) => {
 
 module.exports.generateOTP = async (req, res) => {
   try {
-    
+
     const { email } = req.body;
 
     // Check email
@@ -155,7 +165,7 @@ module.exports.generateOTP = async (req, res) => {
     const otp = generateOTP();
     console.log(otp);
     const otpHash = hashOTP(otp);
-    
+
 
     // OTP expires after 5 minutes
     const expiresAt = new Date(
@@ -208,87 +218,87 @@ module.exports.generateOTP = async (req, res) => {
 
 
 module.exports.verifyOTP = async (req, res) => {
-    
 
-    try {
-        
-        const { otp } = req.body;
-        const email = req.body.email.trim().toLowerCase();
 
-        console.log(email, otp);
+  try {
 
-        const otpRecord = await OTP.findOne({ email });
+    const { otp } = req.body;
+    const email = req.body.email.trim().toLowerCase();
 
-        if (!otpRecord) {
-            return res.json({
-                success: false,
-                message: "OTP not found. Please generate OTP again."
-            });
-        }
+    console.log(email, otp);
 
-        // Check expiry
-        if (otpRecord.expiresAt < new Date()) {
+    const otpRecord = await OTP.findOne({ email });
 
-            await OTP.deleteOne({
-                _id: otpRecord._id
-            });
-
-            return res.json({
-                success: false,
-                message: "OTP expired. Please generate a new OTP."
-            });
-        }
-
-        // Hash entered OTP
-        const otpHash = hashOTP(otp);
-
-        // Compare hashed OTP
-        if (otpRecord.otpHash !== otpHash) {
-            return res.json({
-                success: false,
-                message: "Invalid OTP!"
-            });
-        }
-
-        // Correct OTP → delete OTP
-        await OTP.deleteOne({
-            _id: otpRecord._id
-        });
-
-        // Mark email as verified
-        req.session.emailVerified = email;
-
-        res.json({
-            success: true,
-            message: "Email verified successfully!"
-        });
-
-    } catch (error) {
-
-        console.log(error);
-
-        res.json({
-            success: false,
-            message: "Something went wrong!"
-        });
+    if (!otpRecord) {
+      return res.json({
+        success: false,
+        message: "OTP not found. Please generate OTP again."
+      });
     }
 
-    
+    // Check expiry
+    if (otpRecord.expiresAt < new Date()) {
+
+      await OTP.deleteOne({
+        _id: otpRecord._id
+      });
+
+      return res.json({
+        success: false,
+        message: "OTP expired. Please generate a new OTP."
+      });
+    }
+
+    // Hash entered OTP
+    const otpHash = hashOTP(otp);
+
+    // Compare hashed OTP
+    if (otpRecord.otpHash !== otpHash) {
+      return res.json({
+        success: false,
+        message: "Invalid OTP!"
+      });
+    }
+
+    // Correct OTP → delete OTP
+    await OTP.deleteOne({
+      _id: otpRecord._id
+    });
+
+    // Mark email as verified
+    req.session.emailVerified = email;
+
+    res.json({
+      success: true,
+      message: "Email verified successfully!"
+    });
+
+  } catch (error) {
+
+    console.log(error);
+
+    res.json({
+      success: false,
+      message: "Something went wrong!"
+    });
+  }
+
+
 };
 
 module.exports.profile = async (req, res, next) => {
 
-    try {
+  try {
 
-      console.log("profile controller me aya");
+    console.log("profile controller me aya");
 
-        // res.render("users/profile", {
-        //     user: req.user
-        // });
-      
-    } catch (err) {
+    // res.render("users/profile", {
+    //     user: req.user
+    // });
 
-        next(err);
+  } catch (err) {
 
-    }
+    next(err);
+
+  }
 };
