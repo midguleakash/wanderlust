@@ -1,0 +1,99 @@
+<% layout("/layouts/boilerplate.ejs") %>
+
+<div class="container mt-5">
+
+    <div class="row justify-content-center">
+
+        <div class="col-md-8">
+
+            <div class="card shadow-sm">
+
+                <div class="card-body p-2">
+
+                    <h3 class="mb-4">
+                        Booking Details
+                    </h3>
+
+
+                    <h5>
+                        <%= booking.listing.title %>
+                    </h5>
+
+                    <p class="text-muted">
+                        <%= booking.listing.location %>,
+                        <%= booking.listing.country %>
+                    </p>
+
+
+                    <hr>
+
+
+                    <div class="row">
+
+                        <div class="col-md-6">
+
+                            <p>
+                                <strong>Check-in:</strong>
+                                <%= booking.checkIn.toDateString() %>
+                            </p>
+
+                        </div>
+
+
+                        <div class="col-md-6">
+
+                            <p>
+                                <strong>Check-out:</strong>
+                                <%= booking.checkOut.toDateString() %>
+                            </p>
+
+                        </div>
+
+                    </div>
+
+
+                    <p>
+                        <strong>Guests:</strong>
+                        <%= booking.guests %>
+                    </p>
+
+
+                    <p>
+                        <strong>Nights:</strong>
+                        <%= booking.nights %>
+                    </p>
+
+
+                    <p>
+                        <strong>Total Amount:</strong>
+                        ₹<%= booking.totalAmount %>
+                    </p>
+
+
+                    <p>
+                        <strong>Payment:</strong>
+
+                        <span class="badge bg-warning text-dark">
+                            <%= booking.paymentStatus %>
+                        </span>
+                    </p>
+
+
+                    <p>
+                        <strong>Booking Status:</strong>
+
+                        <span class="badge bg-info text-dark">
+                            <%= booking.bookingStatus %>
+                        </span>
+                    </p>
+
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>

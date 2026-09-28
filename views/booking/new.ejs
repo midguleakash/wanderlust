@@ -1,0 +1,125 @@
+<% layout("/layouts/boilerplate.ejs") %>
+
+    <div class="container mt-5">
+
+        <div class="row justify-content-center">
+
+            <div class="col-md-7">
+
+                <div class="card shadow-sm">
+
+                    <div class="card-body p-2">
+
+                        <h3 class="mb-4">
+                            Book Your Stay
+                        </h3>
+
+
+                        <h5>
+                            <%= listing.title %>
+                        </h5>
+
+                        <p class="text-muted">
+                            <%= listing.location %>,
+                                <%= listing.country %>
+                        </p>
+
+
+                        <hr>
+
+
+                        <form action="/bookings" method="POST">
+
+                            <!-- Listing ID -->
+
+                            <input type="hidden" name="listingId" value="<%= listing._id %>">
+
+
+                            <!-- Check In -->
+
+                            <div class="mb-3">
+
+                                <label for="checkIn" class="form-label">
+                                    Check-in
+                                </label>
+
+                                <input type="date" name="checkIn" id="checkIn" class="form-control" required>
+
+                            </div>
+
+
+                            <!-- Check Out -->
+
+                            <div class="mb-3">
+
+                                <label for="checkOut" class="form-label">
+                                    Check-out
+                                </label>
+
+                                <input type="date" name="checkOut" id="checkOut" class="form-control" required>
+
+                            </div>
+
+
+                            <!-- Guests -->
+
+                            <div class="mb-3">
+
+                                <label for="guests" class="form-label">
+                                    Number of Guests
+                                </label>
+
+                                <input type="number" name="guests" id="guests" class="form-control" min="1" max="4"
+                                    value="1" required>
+
+                            </div>
+
+
+                            <div class="alert alert-light">
+
+                                Price per night:
+
+                                <strong>
+                                    ₹<%= listing.price %>
+                                </strong>
+
+                            </div>
+
+
+                            <button type="submit" class="btn btn-dark w-100">
+                                Continue Booking
+                            </button>
+
+                        </form>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+    <script>
+
+        const today = new Date()
+            .toISOString()
+            .split("T")[0];
+
+        const checkIn = document.getElementById("checkIn");
+        const checkOut = document.getElementById("checkOut");
+
+
+        checkIn.min = today;
+        checkOut.min = today;
+
+
+        checkIn.addEventListener("change", () => {
+
+            checkOut.min = checkIn.value;
+
+        });
+
+    </script>

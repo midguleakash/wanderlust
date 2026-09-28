@@ -22,6 +22,7 @@ const userRouter = require("./routes/user.js");
 const hostRouter = require("./routes/host");
 const adminRouter = require("./routes/admin");
 const profileRouter = require("./routes/profile.js");
+const bookingRouter = require("./routes/booking.js");
 
 
 
@@ -51,7 +52,7 @@ app.engine("ejs" , ejsMate);
 app.use(express.static(path.join(__dirname, "/public")));
 
 const store = MongoStore.create({
-    mongoUrl: dbUrl,
+    mongoUrl: MONGO_URL,
     crypto:{
         secret:process.env.SECRET
     },
@@ -107,6 +108,7 @@ app.use("/" , userRouter);
 app.use("/host", hostRouter);
 app.use("/admin", adminRouter);
 app.use("/profile", profileRouter);
+app.use("/bookings", bookingRouter);
 
 
 
