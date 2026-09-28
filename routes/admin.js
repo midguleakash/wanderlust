@@ -2,13 +2,13 @@ const express = require("express");
 const router = express.Router();
 
 const adminController = require("../controllers/admin.js");
-const { isAdmin } = require("../middleware/admin.js");
+const { isAdmin , isAdminOrSuperAdmin , isSuperAdmin} = require("../middleware/admin.js");
 
 
 // Admin Dashboard
 router.get(
     "/dashboard",
-    // isAdmin,
+    isAdminOrSuperAdmin,
     adminController.dashboard
 );
 
@@ -16,14 +16,14 @@ router.get(
 // Manage Users
 router.get(
     "/users",
-    // isAdmin,
+    isAdminOrSuperAdmin,
     adminController.users
 );
 
 // View User Details
 router.get(
     "/users/:id",
-    // isAdmin,
+    isAdminOrSuperAdmin,
     adminController.userDetails
 );
 
@@ -31,14 +31,14 @@ router.get(
 // Host Approval
 router.get(
     "/hosts",
-    // isAdmin,
+    isAdminOrSuperAdmin,
     adminController.hosts
 );
 
 // Approve Host
 router.patch(
     "/hosts/:id/approve",
-    // isAdmin,    
+    isAdminOrSuperAdmin,    
     adminController.approveHost
 );
 
@@ -46,39 +46,78 @@ router.patch(
 // Reject Host
 router.patch(
     "/hosts/:id/reject",
-    // isAdmin,
+    isAdminOrSuperAdmin,
     adminController.rejectHost
 );
 
 
-// Manage Listings
-router.get(
-    "/listings",
-    // isAdmin,
-    adminController.listings
-);
+
 
 
 // Manage Admins
 router.get(
     "/admins",
-    // isAdmin,
+    isSuperAdmin,
     adminController.admins
 );
 
 // Block User
 router.patch(
     "/users/:id/block",
-    // isAdmin,
+    isAdminOrSuperAdmin,
     adminController.blockUser
 );
 
 // Unblock User
 router.patch(
     "/users/:id/unblock",
-    // isAdmin,
+    isAdminOrSuperAdmin,
     adminController.unblockUser
 );
 
+// Manage Listings
+router.get(
+    "/listings",
+    isAdminOrSuperAdmin,
+    adminController.listings
+);
+
+router.patch(
+    "/listings/:id/toggle",
+    isAdminOrSuperAdmin,
+    adminController.toggleListing
+);
+
+router.get(
+    "/listings/:id",
+    isAdminOrSuperAdmin,
+    adminController.listingDetails
+);
+
+router.get(
+    "/admins/new",
+    isSuperAdmin,
+    adminController.addAdminForm
+);
+
+
+
+router.post(
+    "/admins/create",
+    isSuperAdmin,
+    adminController.createAdmin
+);
+
+router.patch(
+    "/admins/:id/block",
+    isSuperAdmin,
+    adminController.blockAdmin
+);
+
+router.patch(
+    "/admins/:id/unblock",
+    isSuperAdmin,
+    adminController.unblockAdmin
+);
 
 module.exports = router;

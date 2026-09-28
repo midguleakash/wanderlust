@@ -1,1 +1,222 @@
 <% layout("/layouts/boilerplate.ejs") %>
+
+    <div class="container mt-4">
+
+        <!-- Header -->
+        <div class="mb-4">
+
+            <h2>Manage Listings</h2>
+
+            <p class="text-muted">
+                View and manage platform listings.
+            </p>
+
+        </div>
+
+
+        <!-- Search -->
+        <div class="card shadow-sm mb-4">
+
+            <div class="card-body">
+
+                <form action="/admin/listings" method="GET">
+
+                    <div class="row g-2">
+
+                        <!-- Search Listing -->
+                        <div class="col-md-5">
+
+                            <input type="text" name="search" class="form-control" placeholder="Search Listing..."
+                                value="<%= search %>">
+
+                        </div>
+
+
+                        <!-- Location -->
+                        <div class="col-md-4">
+
+                            <input type="text" name="location" class="form-control" placeholder="Location..."
+                                value="<%= selectedLocation %>">
+
+                        </div>
+
+
+                        <!-- Search Button -->
+                        <div class="col-md-1">
+
+                            <button type="submit" class="btn btn-primary w-100">
+                                Search
+                            </button>
+
+                        </div>
+
+
+                        <!-- Clear Button -->
+                        <div class="col-md-2">
+
+                            <a href="/admin/listings" class="btn btn-secondary w-100">
+                                Clear
+                            </a>
+
+                        </div>
+
+                    </div>
+
+                </form>
+
+            </div>
+
+        </div>
+
+
+        <!-- Listings Table -->
+        <div class="card shadow-sm">
+
+            <div class="card-body">
+
+                <h5 class="mb-3 p-2">
+                    Platform Listings
+                </h5>
+
+
+                <div class="table-responsive">
+
+                    <table class="table table-bordered table-hover align-middle">
+
+                        <thead>
+
+                            <tr>
+                                <th>Listing</th>
+                                <th>Owner</th>
+                                <th>Location</th>
+                                <th>Price/Night</th>
+                                <th>Status</th>
+                                <th>Created</th>
+                                <th>Action</th>
+                            </tr>
+
+                        </thead>
+
+
+                        <tbody>
+
+                            <% if (listings.length===0) { %>
+
+                                <tr>
+
+                                    <td colspan="7" class="text-center text-muted">
+                                        No listings found.
+                                    </td>
+
+                                </tr>
+
+                                <% } %>
+
+
+                                    <% listings.forEach(listing=> { %>
+
+                                        <tr>
+
+                                            <!-- Listing -->
+                                            <td>
+                                                <%= listing.title %>
+                                            </td>
+
+
+                                            <!-- Owner -->
+                                            <td>
+
+                                                <% if (listing.owner) { %>
+
+                                                    <%= listing.owner.username %>
+
+                                                        <% } else { %>
+
+                                                            <span class="text-muted">
+                                                                Unknown
+                                                            </span>
+
+                                                            <% } %>
+
+                                            </td>
+
+
+                                            <!-- Location -->
+                                            <td>
+
+                                                <%= listing.location %>,
+                                                    <%= listing.country %>
+
+                                            </td>
+
+
+                                            <!-- Price -->
+                                            <td>
+
+                                                ₹<%= listing.price %>
+
+                                            </td>
+
+
+                                            <!-- Status -->
+                                            <td>
+                                                <% if (listing.isHidden) { %>
+                                                    <span class="badge bg-danger">Hidden</span>
+                                                    <% } else { %>
+                                                        <span class="badge bg-success">Active</span>
+                                                        <% } %>
+                                            </td>
+
+
+                                            <!-- Created -->
+                                            <td>
+
+                                                <%= listing._id .getTimestamp() .toLocaleDateString() %>
+
+                                            </td>
+
+
+                                            <!-- Action -->
+                                            <td>
+
+                                                <a href="/admin/listings/<%= listing._id %>"
+                                                    class="btn btn-info btn-sm">
+                                                    View
+                                                </a>
+
+                                                <form action="/admin/listings/<%= listing._id %>/toggle?_method=PATCH"
+                                                    method="POST" class="d-inline">
+
+                                                    <% if (listing.isHidden) { %>
+
+                                                        <button type="submit" class="btn btn-success btn-sm">
+                                                            Unhide
+                                                        </button>
+
+                                                        <% } else { %>
+
+                                                            <button type="submit" class="btn btn-danger btn-sm">
+                                                                Hide
+                                                            </button>
+
+                                                            <% } %>
+
+                                                </form>
+
+                                            </td>
+
+                                        </tr>
+
+                                        <% }) %>
+
+                        </tbody>
+
+                    </table>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>

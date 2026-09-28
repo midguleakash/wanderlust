@@ -1,172 +1,187 @@
 <div class="mb-3">
-    <button
-        type="button"
-        class="btn btn-primary"
-        id="generateOtpBtn"
-    >
+    <button type="button" class="btn btn-primary" id="generateOtpBtn">
         Generate OTP
     </button>
 </div>
 
-<div
-    id="otpSection"
-    style="display: none;"
-    class="mt-3"
->
+<div id="otpSection" style="display: none;" class="mt-3">
     <div class="mb-3">
 
         <label for="otp" class="form-label">
             Enter OTP
         </label>
 
-        <input
-            type="text"
-            id="otp"
-            class="form-control"
-            placeholder="Enter 6 digit OTP"
-            maxlength="6"
-        >
+        <input type="text" id="otp" class="form-control" placeholder="Enter 6 digit OTP" maxlength="6">
 
     </div>
 
-    <button
-        type="button"
-        class="btn btn-warning"
-        id="verifyOtpBtn"
-    >
+    <button type="button" class="btn btn-warning" id="verifyOtpBtn">
         Verify OTP
     </button>
 
-    
+
 </div>
 
 <div id="otpMessage" class="mt-2"></div>
 
 <script>
-const generateOtpBtn =
-    document.getElementById("generateOtpBtn");
 
-const otpSection =
-    document.getElementById("otpSection");
+    const generateOtpBtn =
+        document.getElementById("generateOtpBtn");
 
-const verifyOtpBtn =
-    document.getElementById("verifyOtpBtn");
+    const otpSection =
+        document.getElementById("otpSection");
 
-const otpMessage =
-    document.getElementById("otpMessage");
+    const verifyOtpBtn =
+        document.getElementById("verifyOtpBtn");
+
+    const otpMessage =
+        document.getElementById("otpMessage");
 
 
-generateOtpBtn.addEventListener("click", async () => {
-    
-    const email =
-        document.getElementById("email").value;
-    
-    if (!email) {
-        otpMessage.innerHTML = `
+
+
+    generateOtpBtn.addEventListener("click", async () => {
+
+        const email =
+            document.getElementById("email").value.trim().toLowerCase();
+
+
+        if (!email) {
+
+            otpMessage.innerHTML = `
             <span class="text-danger">
                 Please enter email first.
             </span>
         `;
-        return;
-    }
 
-    const response = await fetch("/generate-otp", {
-        method: "POST",
+            return;
+        }
 
-        headers: {
-            "Content-Type": "application/json"
-        },
 
-        body: JSON.stringify({
-            email: email
-        })
-    });
+        const response = await fetch("/generate-otp", {
 
-    const data = await response.json();
+            method: "POST",
 
-    if (data.success) {
+            headers: {
+                "Content-Type": "application/json"
+            },
 
-        otpSection.style.display = "block";
+            body: JSON.stringify({
+                email
+            })
 
-        generateOtpBtn.disabled = true;
+        });
 
-        otpMessage.innerHTML = `
-            <span class="text-success mb-2">
+
+        const data = await response.json();
+
+
+        if (data.success) {
+
+            otpSection.style.display = "block";
+
+            generateOtpBtn.disabled = true;
+
+            otpMessage.innerHTML = `
+            <span class="text-success">
                 OTP sent. Please check your email.
             </span>
         `;
 
-    } else {
+        } else {
 
-        otpMessage.innerHTML = `
+            otpMessage.innerHTML = `
             <span class="text-danger">
                 ${data.message}
             </span>
         `;
-    }
-});
+
+        }
+
+    });
 
 
-verifyOtpBtn.addEventListener("click", async () => {
+    verifyOtpBtn.addEventListener("click", async () => {
 
-    const email =
-        document.getElementById("email").value;
+        const email =
+            document.getElementById("email").value.trim().toLowerCase();
 
-    const otp =
-        document.getElementById("otp").value;
+        const otp =
+            document.getElementById("otp").value.trim();
 
-    if (!/^[0-9]{6}$/.test(otp)) {
 
-        otpMessage.innerHTML = `
+        if (!/^[0-9]{6}$/.test(otp)) {
+
+            otpMessage.innerHTML = `
             <span class="text-danger">
                 Enter valid 6 digit OTP.
             </span>
         `;
 
-        return;
-    }
+            return;
+        }
 
-    const response = await fetch("/verify-otp", {
 
-        method: "POST",
+        const response = await fetch("/verify-otp", {
 
-        headers: {
-            "Content-Type": "application/json"
-        },
+            method: "POST",
 
-        body: JSON.stringify({
-            email,
-            otp
-        })
-    });
+            headers: {
+                "Content-Type": "application/json"
+            },
 
-    const data = await response.json();
+            body: JSON.stringify({
+                email,
+                otp
+            })
 
-    if (data.success) {
+        });
 
-        otpMessage.innerHTML = `
+
+        const data = await response.json();
+
+
+        if (data.success) {
+
+            otpMessage.innerHTML = `
             <span class="text-success">
                 Email verified successfully!
             </span>
         `;
 
-        verifyOtpBtn.disabled = true;
 
-        // If signup page
-        const signupBtn =
-            document.getElementById("signupBtn");
+            verifyOtpBtn.disabled = true;
 
-        if (signupBtn) {
-            signupBtn.disabled = false;
-        }
 
-    } else {
+            // Admin page
+            const createAdminBtn =
+                document.getElementById("createAdminBtn");
 
-        otpMessage.innerHTML = `
+            if (createAdminBtn) {
+                createAdminBtn.disabled = false;
+            }
+
+
+            // Signup page
+            const signupBtn =
+                document.getElementById("signupBtn");
+
+            if (signupBtn) {
+                signupBtn.disabled = false;
+            }
+
+
+        } else {
+
+            otpMessage.innerHTML = `
             <span class="text-danger">
                 ${data.message}
             </span>
         `;
-    }
-});
+
+        }
+
+    });
+
 </script>

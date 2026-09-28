@@ -21,6 +21,7 @@ const reviewRouter = require("./routes/review.js");
 const userRouter = require("./routes/user.js");
 const hostRouter = require("./routes/host");
 const adminRouter = require("./routes/admin");
+const profileRouter = require("./routes/profile.js");
 
 
 
@@ -105,7 +106,7 @@ app.use("/listings/:id/reviews" , reviewRouter);
 app.use("/" , userRouter);
 app.use("/host", hostRouter);
 app.use("/admin", adminRouter);
-
+app.use("/profile", profileRouter);
 
 
 

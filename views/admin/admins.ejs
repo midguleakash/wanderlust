@@ -1,1 +1,166 @@
 <% layout("/layouts/boilerplate.ejs") %>
+
+<div class="container mt-4">
+
+    <div class="d-flex justify-content-between align-items-center mb-4">
+
+        <div>
+            <h2>Manage Admins</h2>
+            <p class="text-muted">
+                Add and manage administrator accounts.
+            </p>
+        </div>
+
+        <a href="/admin/admins/new" class="btn btn-primary">
+            + Add New Admin
+        </a>
+
+    </div>
+
+
+    <div class="card shadow-sm">
+
+        <div class="card-body">
+
+            <h5 class="mb-3 ps-1">
+                Administrator Accounts
+            </h5>
+
+            <div class="table-responsive">
+
+                <table class="table table-bordered table-hover align-middle">
+
+                    <thead>
+                        <tr>
+                            <th>Username</th>
+                            <th>Email</th>
+                            <th>Verification</th>
+                            <th>Account Status</th>
+                            <th>Registered</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+
+                    <tbody>
+
+                        <% if (admins.length === 0) { %>
+
+                            <tr>
+                                <td colspan="6"
+                                    class="text-center text-muted">
+                                    No administrators found.
+                                </td>
+                            </tr>
+
+                        <% } %>
+
+
+                        <% admins.forEach(admin => { %>
+
+                            <tr>
+
+                                <td>
+                                    <%= admin.username %>
+                                </td>
+
+                                <td>
+                                    <%= admin.email %>
+                                </td>
+
+                                <td>
+
+                                    <% if (admin.isVerified) { %>
+
+                                        <span class="badge bg-success">
+                                            Verified
+                                        </span>
+
+                                    <% } else { %>
+
+                                        <span class="badge bg-warning text-dark">
+                                            Not Verified
+                                        </span>
+
+                                    <% } %>
+
+                                </td>
+
+                                <td>
+
+                                    <% if (admin.isBlocked) { %>
+
+                                        <span class="badge bg-danger">
+                                            Blocked
+                                        </span>
+
+                                    <% } else { %>
+
+                                        <span class="badge bg-success">
+                                            Active
+                                        </span>
+
+                                    <% } %>
+
+                                </td>
+
+                                <td>
+                                    <%= admin._id.getTimestamp().toLocaleDateString() %>
+                                </td>
+
+                                <td>
+
+                                    <% if (admin._id.equals()) { %>
+
+                                        <span class="text-muted">
+                                            Current Admin
+                                        </span>
+
+                                    <% } else { %>
+
+                                        <% if (admin.isBlocked) { %>
+
+                                            <form
+                                                action="/admin/admins/<%= admin._id %>/unblock?_method=PATCH"
+                                                method="POST"
+                                                class="d-inline"
+                                            >
+                                                <button
+                                                    class="btn btn-success btn-sm">
+                                                    Unblock
+                                                </button>
+                                            </form>
+
+                                        <% } else { %>
+
+                                            <form
+                                                action="/admin/admins/<%= admin._id %>/block?_method=PATCH"
+                                                method="POST"
+                                                class="d-inline"
+                                            >
+                                                <button
+                                                    class="btn btn-danger btn-sm">
+                                                    Block
+                                                </button>
+                                            </form>
+
+                                        <% } %>
+
+                                    <% } %>
+
+                                </td>
+
+                            </tr>
+
+                        <% }) %>
+
+                    </tbody>
+
+                </table>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>

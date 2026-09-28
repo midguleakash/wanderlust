@@ -3,7 +3,8 @@
     background-color: red;
     color: #fff;
     border-radius: 25px;
-    padding: 0 1rem 0 1rem !important;
+    padding: 0 1rem !important;
+    width: 50%;
   }
 
   .search-btn:hover {
@@ -18,94 +19,168 @@
 
   .search-input {
     border-radius: 25px;
-    padding: 0.5rem 3rem 0.5rem 3rem;
+    padding: 0.5rem 3rem;
   }
 
-  /* Apply background when expanded on small screens */
+  .searchNavbar {
+    display: flex;
+  }
+
   @media (max-width: 991.98px) {
-    /* Below lg */
     .custom-collapse-bg {
-      background-color: #f8f9fa; /* Light gray */
+      background-color: #f8f9fa;
       padding: 1rem;
       border-radius: 0 0 8px 8px;
     }
   }
 
   @media (max-width: 700px) {
-    /* Below lg */
-
     .search-input {
       border-radius: 25px;
       padding: 0;
     }
   }
-
-  .searchNavbar {
-    display: flex;
-  }
 </style>
+
 
 <nav class="navbar navbar-expand-lg bg-body-light border-bottom sticky-top">
   <div class="container-fluid">
-    <a class="navbar-brand" href="/listings"
-      ><i class="fa-solid fa-compass"></i
-    ></a>
 
-    <div class="navbar-nav me-auto">
-      <a class="nav-link" href="/listings">Explore</a>
-    </div>
+    <!-- Left: Compass -->
+    <a class="navbar-brand" href="<%=
+      !currentUser
+        ? '/listings'
+        : currentUser.role === 'guest'
+        ? '/listings'
+        : currentUser.role === 'host'
+        ? '/host/dashboard'
+        : currentUser.role === 'admin'
+        ? '/admin/dashboard'
+        : currentUser.role === 'superadmin'
+        ? '/admin/dashboard'
+        : '/listings'
+   %>">
 
-    <!-- <button
-      class="navbar-toggler me-2 btn search2 search-btn"
-      type="button"
-      data-bs-toggle="collapse"
-      data-bs-target="#searchNhavbar"
-    >
-      <i class="fa-solid fa-magnifying-glass"></i>Search
-    </button> -->
+      <i class="fa-solid fa-compass"></i>
 
-    <div
-      class="d-flex justify-content-center w-50 mx-auto searchNavbar"
-      id="searchNavbar"
-    >
-      <div class="navbar-nav ms-auto">
-        <form class="d-flex">
-          <input
-            class="form-control me-2 search-input"
-            type="search"
-            placeholder="Search Destination"
-          />
-          <button class="btn search-btn" type="submit">
-            <i class="fa-solid fa-magnifying-glass"></i>Search
-          </button>
-        </form>
+    </a>
+
+
+    <!-- Search: Only Guest + Not Logged In -->
+    <% if (!currentUser || currentUser.role==="guest" ) { %>
+
+      <div class="d-flex justify-content-center w-50 mx-auto searchNavbar">
+
+        <div class="navbar-nav ms-auto">
+
+          <form class="d-flex">
+
+            <input class="form-control me-2 search-input" type="search" placeholder="Search Destination" />
+
+            <button class="btn search-btn" type="submit">
+              <i class="fa-solid fa-magnifying-glass"></i>
+              Search
+            </button>
+
+          </form>
+
+        </div>
+
       </div>
-    </div>
 
-    <button
-      class="navbar-toggler"
-      type="button"
-      data-bs-toggle="collapse"
-      data-bs-target="#navbarNavAltMarkup"
-    >
-      <span class="navbar-toggler-icon"></span>
-    </button>
+      <% } %>
 
-    <div
-      class="collapse navbar-collapse custom-collapse-bg"
-      id="navbarNavAltMarkup"
-    >
-      <div class="navbar-nav ms-auto">
-        <a class="nav-link" href="/listings/new">Add New Listing</a>
 
-        <% if(!currentUser) { %>
-        <a class="nav-link" href="/signup"><b>Sign up</b></a>
-        <a class="nav-link" href="/login"><b>Log in</b></a>
-        <% } %> <% if(currentUser) { %>
-        <a class="nav-link" href="#"><b><%= currentUser.username %></b></a>
-        <a class="nav-link" href="/logout"><b>Log out</b></a>
-        <% } %>
-      </div>
-    </div>
+        <!-- Mobile Button -->
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNavAltMarkup">
+          <span class="navbar-toggler-icon"></span>
+        </button>
+
+
+        <div class="collapse navbar-collapse custom-collapse-bg" id="navbarNavAltMarkup">
+
+          <div class="navbar-nav ms-auto">
+
+
+            <!-- Not Logged In -->
+            <% if (!currentUser) { %>
+
+              <a class="nav-link" href="/signup">
+                <b>Sign up</b>
+              </a>
+
+              <a class="nav-link" href="/login">
+                <b>Log in</b>
+              </a>
+
+              <% } %>
+
+
+                <!-- Logged In -->
+                <% if (currentUser) { %>
+
+                  <div class="nav-item dropdown">
+
+                    <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown"
+                      aria-expanded="false">
+
+                      <% if (currentUser.role==="admin" || currentUser.role==="superadmin" ) { %>
+
+                        <i class="fa-solid fa-shield-halved"></i>
+
+                        <% } else if (currentUser.role==="host" ) { %>
+
+                          <i class="fa-solid fa-house"></i>
+
+                          <% } else { %>
+
+                            <i class="fa-solid fa-user"></i>
+
+                            <% } %>
+
+                              <b>
+                                <%= currentUser.username %>
+                              </b>
+
+                    </a>
+
+
+                    <ul class="dropdown-menu dropdown-menu-end">
+
+                      <li>
+                        <a class="dropdown-item" href="/profile">
+                          <i class="fa-solid fa-user me-2"></i>
+                          Profile
+                        </a>
+                      </li>
+
+                      <li>
+                        <a class="dropdown-item" href="/profile/change-password">
+                          <i class="fa-solid fa-key me-2"></i>
+                          Change Password
+                        </a>
+                      </li>
+
+                      <li>
+                        <hr class="dropdown-divider">
+                      </li>
+
+                      <li>
+                        <a class="dropdown-item" href="/logout">
+                          <i class="fa-solid fa-right-from-bracket me-2"></i>
+                          Logout
+                        </a>
+                      </li>
+
+                    </ul>
+
+                  </div>
+
+                  <% } %>
+
+          </div>
+
+        </div>
+
   </div>
 </nav>

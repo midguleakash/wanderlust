@@ -107,24 +107,28 @@ module.exports.loginForm = (req, res) => {
 
 module.exports.login = async (req, res) => {
 
-    req.flash("success", "Login successful!");
+  req.flash("success", "Login successful!");
 
-    // Guest
-    if (req.user.role === "guest") {
-        return res.redirect(res.locals.redirectUrl || "/listings");
-    }
+  // Guest
+  if (req.user.role === "guest") {
+    return res.redirect(res.locals.redirectUrl || "/listings");
+  }
 
-    // Host
-    if (req.user.role === "host") {
-        return res.redirect("/host/dashboard");
-    }
+  // Host
+  if (req.user.role === "host") {
+    return res.redirect("/host/dashboard");
+  }
 
-    // Admin
-    if (req.user.role === "admin") {
-        return res.redirect("/admin/dashboard");
-    }
+  // Admin
+  // Admin + Super Admin
+  if (
+    req.user.role === "admin" ||
+    req.user.role === "superadmin"
+  ) {
+    return res.redirect("/admin/dashboard");
+  }
 
-    return res.redirect("/listings");
+  return res.redirect("/listings");
 };
 
 module.exports.logout = (req, res, next) => {
@@ -163,7 +167,7 @@ module.exports.generateOTP = async (req, res) => {
 
     // Generate OTP
     const otp = generateOTP();
-    console.log(otp);
+    
     const otpHash = hashOTP(otp);
 
 
@@ -225,7 +229,7 @@ module.exports.verifyOTP = async (req, res) => {
     const { otp } = req.body;
     const email = req.body.email.trim().toLowerCase();
 
-    console.log(email, otp);
+    
 
     const otpRecord = await OTP.findOne({ email });
 
@@ -286,19 +290,3 @@ module.exports.verifyOTP = async (req, res) => {
 
 };
 
-module.exports.profile = async (req, res, next) => {
-
-  try {
-
-    console.log("profile controller me aya");
-
-    // res.render("users/profile", {
-    //     user: req.user
-    // });
-
-  } catch (err) {
-
-    next(err);
-
-  }
-};

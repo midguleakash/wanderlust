@@ -39,11 +39,6 @@ router
 
 router.get("/logout", userController.logout);
 
-// Profile
-router.get(
-    "/profile",
-    // isLoggedIn,
-    userController.profile
-);
+
 
 module.exports = router;

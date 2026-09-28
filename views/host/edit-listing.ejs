@@ -1,0 +1,215 @@
+<% layout("/layouts/boilerplate.ejs") %>
+
+<div class="container mt-4">
+
+    <div class="row justify-content-center">
+
+        <div class="col-md-8">
+
+            <div class="card shadow-sm">
+
+                <div class="card-body p-2">
+
+                    <h2 class="mb-4">
+                        Edit Listing
+                    </h2>
+
+                    <form
+                        action="/host/listings/<%= listing._id %>?_method=PUT"
+                        method="POST"
+                        enctype="multipart/form-data"
+                    >
+
+                        <!-- Title -->
+
+                        <div class="mb-3">
+
+                            <label
+                                for="title"
+                                class="form-label"
+                            >
+                                Title
+                            </label>
+
+                            <input
+                                type="text"
+                                name="listing[title]"
+                                id="title"
+                                class="form-control"
+                                value="<%= listing.title %>"
+                                required
+                            >
+
+                        </div>
+
+
+                        <!-- Description -->
+
+                        <div class="mb-3">
+
+                            <label
+                                for="description"
+                                class="form-label"
+                            >
+                                Description
+                            </label>
+
+                            <textarea
+                                name="listing[description]"
+                                id="description"
+                                class="form-control"
+                                rows="5"
+                                required
+                            ><%= listing.description %></textarea>
+
+                        </div>
+
+
+                        <!-- Price -->
+
+                        <div class="mb-3">
+
+                            <label
+                                for="price"
+                                class="form-label"
+                            >
+                                Price / Night
+                            </label>
+
+                            <input
+                                type="number"
+                                name="listing[price]"
+                                id="price"
+                                class="form-control"
+                                value="<%= listing.price %>"
+                                min="0"
+                                required
+                            >
+
+                        </div>
+
+
+                        <!-- Location -->
+
+                        <div class="mb-3">
+
+                            <label
+                                for="location"
+                                class="form-label"
+                            >
+                                Location
+                            </label>
+
+                            <input
+                                type="text"
+                                name="listing[location]"
+                                id="location"
+                                class="form-control"
+                                value="<%= listing.location %>"
+                                required
+                            >
+
+                        </div>
+
+
+                        <!-- Country -->
+
+                        <div class="mb-3">
+
+                            <label
+                                for="country"
+                                class="form-label"
+                            >
+                                Country
+                            </label>
+
+                            <input
+                                type="text"
+                                name="listing[country]"
+                                id="country"
+                                class="form-control"
+                                value="<%= listing.country %>"
+                                required
+                            >
+
+                        </div>
+
+
+                        <!-- Current Image -->
+
+                        <div class="mb-3">
+
+                            <label class="form-label">
+                                Current Image
+                            </label>
+
+                            <br>
+
+                            <img
+                                src="<%= listing.image.url %>"
+                                alt="<%= listing.title %>"
+                                style="
+                                    width: 200px;
+                                    height: 140px;
+                                    object-fit: cover;
+                                    border-radius: 8px;
+                                "
+                            >
+
+                        </div>
+
+
+                        <!-- New Image -->
+
+                        <div class="mb-4">
+
+                            <label
+                                for="image"
+                                class="form-label"
+                            >
+                                Upload New Image
+                            </label>
+
+                            <input
+                                type="file"
+                                name="listing[image]"
+                                id="image"
+                                class="form-control"
+                                accept="image/*"
+                            >
+
+                            <small class="text-muted">
+                                Leave empty to keep the current image.
+                            </small>
+
+                        </div>
+
+
+                        <!-- Buttons -->
+
+                        <button
+                            type="submit"
+                            class="btn btn-success"
+                        >
+                            Update Listing
+                        </button>
+
+
+                        <a
+                            href="/host/listings/<%= listing._id %>"
+                            class="btn btn-secondary"
+                        >
+                            Cancel
+                        </a>
+
+                    </form>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>

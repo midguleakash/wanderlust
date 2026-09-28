@@ -1,0 +1,157 @@
+<div class="mb-3">
+
+    <button
+        type="button"
+        class="btn btn-primary"
+        id="generateExistingOtpBtn"
+    >
+        Generate OTP
+    </button>
+
+</div>
+
+
+<div id="existingOtpSection" style="display: none;">
+
+    <div class="mb-3">
+
+        <label for="existingOtp" class="form-label">
+            Enter OTP
+        </label>
+
+        <input
+            type="text"
+            id="existingOtp"
+            class="form-control"
+            maxlength="6"
+            placeholder="Enter 6 digit OTP"
+        >
+
+    </div>
+
+
+    <button
+        type="button"
+        class="btn btn-warning"
+        id="verifyExistingOtpBtn"
+    >
+        Verify OTP
+    </button>
+
+</div>
+
+
+<div id="existingOtpMessage" class="mt-3"></div>
+
+
+<script>
+
+const generateExistingOtpBtn =
+    document.getElementById("generateExistingOtpBtn");
+
+const existingOtpSection =
+    document.getElementById("existingOtpSection");
+
+const verifyExistingOtpBtn =
+    document.getElementById("verifyExistingOtpBtn");
+
+const existingOtpMessage =
+    document.getElementById("existingOtpMessage");
+
+
+generateExistingOtpBtn.addEventListener("click", async () => {
+
+    const response = await fetch(
+        "/profile/change-password/send-otp",
+        {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            }
+        }
+    );
+
+    const data = await response.json();
+
+    if (data.success) {
+
+        existingOtpSection.style.display = "block";
+
+        generateExistingOtpBtn.disabled = true;
+
+        existingOtpMessage.innerHTML =
+            `<span class="text-success">
+                OTP sent to your registered email.
+            </span>`;
+
+    } else {
+
+        existingOtpMessage.innerHTML =
+            `<span class="text-danger">
+                ${data.message}
+            </span>`;
+    }
+
+});
+
+
+verifyExistingOtpBtn.addEventListener("click", async () => {
+
+    const otp =
+        document.getElementById("existingOtp").value.trim();
+
+
+    if (!/^[0-9]{6}$/.test(otp)) {
+
+        existingOtpMessage.innerHTML =
+            `<span class="text-danger">
+                Please enter a valid 6 digit OTP.
+            </span>`;
+
+        return;
+    }
+
+
+    const response = await fetch(
+        "/profile/change-password/verify-otp",
+        {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({ otp })
+        }
+    );
+
+
+    const data = await response.json();
+
+
+    if (data.success) {
+
+        existingOtpMessage.innerHTML =
+            `<span class="text-success">
+                Email verified successfully!
+            </span>`;
+
+        verifyExistingOtpBtn.disabled = true;
+
+
+        const changePasswordBtn =
+            document.getElementById("changePasswordBtn");
+
+        if (changePasswordBtn) {
+            changePasswordBtn.disabled = false;
+        }
+
+    } else {
+
+        existingOtpMessage.innerHTML =
+            `<span class="text-danger">
+                ${data.message}
+            </span>`;
+    }
+
+});
+
+</script>

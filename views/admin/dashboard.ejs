@@ -3,7 +3,9 @@
     <div class="container mt-4">
 
         <div class="mb-4">
-            <h2>Admin Dashboard</h2>
+            <h2>
+                <%= currentUser.role==="superadmin" ? "Super Admin Dashboard" : "Admin Dashboard" %>
+            </h2>
             <p class="text-muted">
                 Welcome, <%= %>
             </p>
@@ -123,22 +125,24 @@
                     </div>
                 </div>
             </div>
+            
+            <% if (currentUser.role==="superadmin" ) { %>
+                <div class="col-md-3">
+                    <div class="card shadow-sm h-100">
+                        <div class="card-body m-2">
+                            <h5>Manage Admins</h5>
 
-            <div class="col-md-3">
-                <div class="card shadow-sm h-100">
-                    <div class="card-body m-2">
-                        <h5>Manage Admins</h5>
+                            <p class="text-muted">
+                                Add and manage administrator accounts.
+                            </p>
 
-                        <p class="text-muted">
-                            Add and manage administrator accounts.
-                        </p>
-
-                        <a href="/admin/admins" class="btn btn-danger">
-                            Manage Admins
-                        </a>
+                            <a href="/admin/admins" class="btn btn-danger">
+                                Manage Admins
+                            </a>
+                        </div>
                     </div>
                 </div>
-            </div>
+                <% } %>
 
         </div>
 

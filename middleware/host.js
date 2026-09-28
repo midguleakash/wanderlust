@@ -1,27 +1,44 @@
 module.exports.isApprovedHost = (req, res, next) => {
 
-    // // 1. Login check
-    // if (!req.isAuthenticated()) {
-    //     req.flash("error", "Please login first.");
-    //     return res.redirect("/login");
-    // }
+    // 1. Login check
+    if (!req.isAuthenticated()) {
+        req.flash("error", "Please login first.");
+        return res.redirect("/login");
+    }
 
-    // // 2. Role check
-    // if (req.user.role !== "host") {
-    //     req.flash("error", "Host access required.");
-    //     return res.redirect("/listings");
-    // }
+    // 2. Role check
+    if (req.user.role !== "host") {
+        req.flash("error", "Host access required.");
+        return res.redirect("/listings");
+    }
 
-    // // 3. Approval check
-    // if (!req.user.hostApproved) {
-    //     req.flash(
-    //         "error",
-    //         "Your host account is waiting for admin approval."
-    //     );
+    // 3. Approval check
+    if (!req.user.hostApproved) {
+        req.flash(
+            "error",
+            "Your host account is waiting for admin approval."
+        );
 
-        
-    // }
+        return res.redirect("/host/dashboard");
+    }
 
-    // Everything is okay
+    
+    next();
+};
+
+module.exports.isHost = (req, res, next) => {
+
+    // User login nahi hai
+    if (!req.isAuthenticated()) {
+        req.flash("error", "Please login first.");
+        return res.redirect("/login");
+    }
+
+    // User host nahi hai
+    if (req.user.role !== "host") {
+        req.flash("error", "Host access required.");
+        return res.redirect("/listings");
+    }
+
     next();
 };

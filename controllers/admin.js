@@ -1,6 +1,10 @@
 const User = require("../models/user.js");
 const Listing = require("../models/listing.js");
 
+const OTP = require("../models/otp.js");
+const { generateOTP, hashOTP } = require("../utils/otpGenerator.js");
+const { sendEmail } = require("../services/emailService.js");
+
 
 // Admin Dashboard
 module.exports.dashboard = async (req, res, next) => {
@@ -95,12 +99,115 @@ module.exports.users = async (req, res, next) => {
 
 
 
-module.exports.listings = async (req, res) => {
-    res.render("admin/listings.ejs");
+// Manage Listings
+module.exports.listings = async (req, res, next) => {
+    try {
+        const { search, location } = req.query;
+
+        let filter = {};
+
+        if (search) {
+            filter.title = {
+                $regex: search,
+                $options: "i"
+            };
+        }
+
+        if (location) {
+            filter.location = {
+                $regex: location,
+                $options: "i"
+            };
+        }
+
+        const listings = await Listing.find(filter)
+            .populate("owner")
+            .sort({ _id: -1 });
+
+        res.render("admin/listings.ejs", {
+            listings,
+            search: search || "",
+            selectedLocation: location || ""
+        });
+
+    } catch (err) {
+        next(err);
+    }
 };
 
-module.exports.admins = async (req, res) => {
-    res.render("admin/admins.ejs");
+
+module.exports.toggleListing = async (req, res, next) => {
+    try {
+        const { id } = req.params;
+
+        const listing = await Listing.findById(id);
+
+        if (!listing) {
+            req.flash("error", "Listing not found!");
+            return res.redirect("/admin/listings");
+        }
+
+        listing.isHidden = !listing.isHidden;
+
+        await listing.save();
+
+        if (listing.isHidden) {
+            req.flash("success", "Listing hidden successfully!");
+        } else {
+            req.flash("success", "Listing unhidden successfully!");
+        }
+
+        res.redirect("/admin/listings");
+
+    } catch (err) {
+        next(err);
+    }
+};
+
+module.exports.listingDetails = async (req, res, next) => {
+    try {
+        const { id } = req.params;
+
+        const listing = await Listing.findById(id)
+            .populate("owner")
+            .populate({
+                path: "reviews",
+                populate: {
+                    path: "author"
+                }
+            });
+
+        if (!listing) {
+            req.flash("error", "Listing not found!");
+            return res.redirect("/admin/listings");
+        }
+
+        res.render("admin/listing-details.ejs", {
+            listing
+        });
+
+    } catch (err) {
+        next(err);
+    }
+};
+
+
+
+// Manage Admins
+module.exports.admins = async (req, res, next) => {
+    try {
+
+        const admins = await User.find({
+            role: "admin"
+        }).sort({ _id: -1 });
+
+        res.render("admin/admins.ejs", {
+            admins
+        });
+
+    } catch (err) {
+        next(err);
+    }
 };
 
 
@@ -250,6 +357,191 @@ module.exports.userDetails = async (req, res, next) => {
         res.render("admin/user-details.ejs", {
             user
         });
+
+    } catch (err) {
+        next(err);
+    }
+};
+
+
+
+
+
+
+module.exports.createAdmin = async (req, res, next) => {
+
+    try {
+
+        let {
+            username,
+            email,
+            password,
+            confirmPassword
+        } = req.body;
+
+
+        username = username.trim();
+        email = email.trim().toLowerCase();
+
+
+        // Check OTP verification
+
+        if (req.session.emailVerified !== email) {
+
+            req.flash(
+                "error",
+                "Please verify your email before creating admin."
+            );
+
+            return res.redirect("/admin/admins/new");
+        }
+
+
+        // Check password
+
+        if (password !== confirmPassword) {
+
+            req.flash(
+                "error",
+                "Passwords do not match."
+            );
+
+            return res.redirect("/admin/admins/new");
+        }
+
+
+        // Check existing username/email
+
+        const existingUser = await User.findOne({
+            $or: [
+                { username },
+                { email }
+            ]
+        });
+
+
+        if (existingUser) {
+
+            if (existingUser.username === username) {
+
+                req.flash(
+                    "error",
+                    "Username is already registered!"
+                );
+
+            } else {
+
+                req.flash(
+                    "error",
+                    "Email is already registered!"
+                );
+
+            }
+
+            return res.redirect("/admin/admins/new");
+        }
+
+
+        // Create Admin
+
+        const newAdmin = new User({
+
+            username,
+            email,
+
+            role: "admin",
+
+            isVerified: true,
+
+            isBlocked: false
+
+        });
+
+
+        await User.register(
+            newAdmin,
+            password
+        );
+
+
+        // Remove OTP verification from session
+
+        delete req.session.emailVerified;
+
+
+        req.flash(
+            "success",
+            "New administrator created successfully!"
+        );
+
+
+        res.redirect("/admin/admins");
+
+
+    } catch (err) {
+
+        next(err);
+
+    }
+
+};
+
+module.exports.addAdminForm = (req, res) => {
+    res.render("admin/add-admin.ejs");
+};
+
+
+module.exports.blockAdmin = async (req, res, next) => {
+    try {
+
+        const { id } = req.params;
+
+        const admin = await User.findOne({
+            _id: id,
+            role: "admin"
+        });
+
+        if (!admin) {
+            req.flash("error", "Admin not found!");
+            return res.redirect("/admin/admins");
+        }
+
+        admin.isBlocked = true;
+
+        await admin.save();
+
+        req.flash("success", "Admin blocked successfully!");
+
+        res.redirect("/admin/admins");
+
+    } catch (err) {
+        next(err);
+    }
+};
+
+
+module.exports.unblockAdmin = async (req, res, next) => {
+    try {
+
+        const { id } = req.params;
+
+        const admin = await User.findOne({
+            _id: id,
+            role: "admin"
+        });
+
+        if (!admin) {
+            req.flash("error", "Admin not found!");
+            return res.redirect("/admin/admins");
+        }
+
+        admin.isBlocked = false;
+
+        await admin.save();
+
+        req.flash("success", "Admin unblocked successfully!");
+
+        res.redirect("/admin/admins");
 
     } catch (err) {
         next(err);

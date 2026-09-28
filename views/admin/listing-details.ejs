@@ -1,0 +1,243 @@
+<% layout("/layouts/boilerplate.ejs") %>
+
+<div class="container mt-4 mb-5">
+
+    <!-- Header -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
+
+        <div>
+            <h2>Listing Details</h2>
+            <p class="text-muted">
+                View and manage this platform listing.
+            </p>
+        </div>
+
+        <a href="/admin/listings" class="btn btn-secondary">
+            Back to Listings
+        </a>
+
+    </div>
+
+
+    <div class="row">
+
+        <!-- Listing Information -->
+        <div class="col-md-8">
+
+            <div class="card shadow-sm mb-4">
+
+                <img
+                    src="<%= listing.image.url %>"
+                    class="card-img-top"
+                    alt="listing-image"
+                    style="height: 350px; object-fit: cover;"
+                >
+
+                <div class="card-body p-1">
+
+                    <h3 class="card-title">
+                        <%= listing.title %>
+                    </h3>
+
+                    <p class="text-muted">
+                        <%= listing.description %>
+                    </p>
+
+                    <hr>
+
+                    <p>
+                        <strong>Location:</strong>
+                        <%= listing.location %>,
+                        <%= listing.country %>
+                    </p>
+
+                    <p>
+                        <strong>Price:</strong>
+                        ₹<%= listing.price.toLocaleString("en-IN") %> / night
+                    </p>
+
+                    <p>
+                        <strong>Created:</strong>
+                        <%= listing._id.getTimestamp().toLocaleDateString() %>
+                    </p>
+
+                </div>
+
+            </div>
+
+
+            <!-- Reviews -->
+
+            <div class="card shadow-sm mb-4">
+
+                <div class="card-body p-1">
+
+                    <h5 class="mb-3">
+                        Reviews
+                    </h5>
+
+                    <% if (listing.reviews.length === 0) { %>
+
+                        <p class="text-muted">
+                            No reviews yet.
+                        </p>
+
+                    <% } else { %>
+
+                        <% listing.reviews.forEach(review => { %>
+
+                            <div class="border-bottom mb-3 pb-3">
+
+                                <strong>
+                                    <%= review.author ? review.author.username : "Unknown User" %>
+                                </strong>
+
+                                <p class="mb-1">
+                                    <%= review.comment %>
+                                </p>
+
+                                <span>
+                                    Rating:
+                                    <%= review.rating %> / 5
+                                </span>
+
+                            </div>
+
+                        <% }) %>
+
+                    <% } %>
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <!-- Admin Information -->
+        <div class="col-md-4">
+
+            <!-- Owner -->
+            <div class="card shadow-sm mb-4 p-1">
+
+                <div class="card-body">
+
+                    <h5 class="mb-3">
+                        Owner Information
+                    </h5>
+
+                    <% if (listing.owner) { %>
+
+                        <p>
+                            <strong>Username:</strong>
+                            <%= listing.owner.username %>
+                        </p>
+
+                        <p>
+                            <strong>Email:</strong>
+                            <%= listing.owner.email %>
+                        </p>
+
+                        <p>
+                            <strong>Role:</strong>
+                            <%= listing.owner.role %>
+                        </p>
+
+                    <% } else { %>
+
+                        <p class="text-muted">
+                            Owner not found.
+                        </p>
+
+                    <% } %>
+
+                </div>
+
+            </div>
+
+
+            <!-- Listing Status -->
+            <div class="card shadow-sm mb-4">
+
+                <div class="card-body p-1">
+
+                    <h5 class="mb-3">
+                        Listing Status
+                    </h5>
+
+                    <% if (listing.isHidden) { %>
+
+                        <span class="badge bg-danger fs-6">
+                            Hidden
+                        </span>
+
+                    <% } else { %>
+
+                        <span class="badge bg-success fs-6">
+                            Active
+                        </span>
+
+                    <% } %>
+
+
+                    <hr>
+
+                    <!-- Hide / Unhide -->
+
+                    <form
+                        action="/admin/listings/<%= listing._id %>/toggle?_method=PATCH"
+                        method="POST"
+                    >
+
+                        <% if (listing.isHidden) { %>
+
+                            <button
+                                type="submit"
+                                class="btn btn-success w-100"
+                            >
+                                Unhide Listing
+                            </button>
+
+                        <% } else { %>
+
+                            <button
+                                type="submit"
+                                class="btn btn-danger w-100"
+                            >
+                                Hide Listing
+                            </button>
+
+                        <% } %>
+
+                    </form>
+
+                </div>
+
+            </div>
+
+
+            <!-- Public View -->
+
+            <div class="card shadow-sm">
+
+                <div class="card-body p-1">
+
+                    <h5>Other Actions</h5>
+
+                    <a
+                        href="/listings/<%= listing._id %>"
+                        target="_blank"
+                        class="btn btn-info w-100"
+                    >
+                        View Public Listing
+                    </a>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>

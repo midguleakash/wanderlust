@@ -37,6 +37,10 @@ const listingSchema = new Schema({
       required: true,
     },
   },
+  isHidden: {
+        type: Boolean,
+        default: false
+    },
 });
 
 listingSchema.post("findOneAndDelete", async (listing) => {
