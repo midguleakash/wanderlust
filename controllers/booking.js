@@ -334,3 +334,22 @@ module.exports.showBooking = async (req, res, next) => {
 
     }
 };
+
+
+module.exports.myBookings = async (req, res, next) => {
+    try {
+        const bookings = await Booking.find({
+            guest: req.user._id
+        })
+        .populate("listing")
+        .populate("host")
+        .sort({ createdAt: -1 });
+
+        res.render("booking/my-bookings.ejs", {
+            bookings
+        });
+
+    } catch (err) {
+        next(err);
+    }
+};

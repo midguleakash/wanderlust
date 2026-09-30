@@ -147,30 +147,43 @@
 
                     <ul class="dropdown-menu dropdown-menu-end">
 
-                      <li>
-                        <a class="dropdown-item" href="/profile">
-                          <i class="fa-solid fa-user me-2"></i>
-                          Profile
-                        </a>
-                      </li>
+                      <% if (currentUser.role==="guest" ) { %>
+                        <li>
+                          <a class="dropdown-item" href="/bookings/my">
+                            <i class="fa-solid fa-calendar-check me-2"></i>
+                            My Bookings
+                          </a>
+                        </li>
 
-                      <li>
-                        <a class="dropdown-item" href="/profile/change-password">
-                          <i class="fa-solid fa-key me-2"></i>
-                          Change Password
-                        </a>
-                      </li>
+                        <li>
+                          <hr class="dropdown-divider">
+                        </li>
+                        <% } %>
 
-                      <li>
-                        <hr class="dropdown-divider">
-                      </li>
+                          <li>
+                            <a class="dropdown-item" href="/profile">
+                              <i class="fa-solid fa-user me-2"></i>
+                              Profile
+                            </a>
+                          </li>
 
-                      <li>
-                        <a class="dropdown-item" href="/logout">
-                          <i class="fa-solid fa-right-from-bracket me-2"></i>
-                          Logout
-                        </a>
-                      </li>
+                          <li>
+                            <a class="dropdown-item" href="/profile/change-password">
+                              <i class="fa-solid fa-key me-2"></i>
+                              Change Password
+                            </a>
+                          </li>
+
+                          <li>
+                            <hr class="dropdown-divider">
+                          </li>
+
+                          <li>
+                            <a class="dropdown-item" href="/logout">
+                              <i class="fa-solid fa-right-from-bracket me-2"></i>
+                              Logout
+                            </a>
+                          </li>
 
                     </ul>
 
