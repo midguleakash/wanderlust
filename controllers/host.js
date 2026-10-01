@@ -1,5 +1,6 @@
 const Listing = require("../models/listing.js");
 const mbxGeocoding = require("@mapbox/mapbox-sdk/services/geocoding");
+const Booking = require("../models/booking.js");
 
 const geocodingClient = mbxGeocoding({
     accessToken: process.env.MAP_TOKEN
@@ -7,15 +8,24 @@ const geocodingClient = mbxGeocoding({
 
 module.exports.dashboard = async (req, res, next) => {
     try {
-
-        // Current host ki total listings
         const listingCount = await Listing.countDocuments({
             owner: req.user._id
         });
 
-        // Booking system abhi develop nahi hua
-        const bookingCount = 0;
-        const totalEarnings = 0;
+        const bookings = await Booking.find({
+            host: req.user._id,
+            bookingStatus: {
+                $in: ["confirmed", "completed"]
+            },
+            paymentStatus: "paid"
+        });
+
+        const bookingCount = bookings.length;
+
+        const totalEarnings = bookings.reduce(
+            (total, booking) => total + booking.totalAmount,
+            0
+        );
 
         res.render("host/dashboard.ejs", {
             listingCount,
@@ -30,8 +40,12 @@ module.exports.dashboard = async (req, res, next) => {
 
 module.exports.bookings = async (req, res, next) => {
     try {
-
-        const bookings = [];
+        const bookings = await Booking.find({
+            host: req.user._id
+        })
+            .populate("guest")
+            .populate("listing")
+            .sort({ createdAt: -1 });
 
         res.render("host/bookings.ejs", {
             bookings
@@ -269,5 +283,36 @@ module.exports.createListing = async (req, res, next) => {
 
         next(err);
 
+    }
+};
+
+
+module.exports.showBooking = async (req, res, next) => {
+    try {
+        const booking = await Booking.findById(req.params.id)
+            .populate("guest")
+            .populate("listing")
+            .populate("host");
+
+        if (!booking) {
+            req.flash("error", "Booking not found!");
+            return res.redirect("/host/bookings");
+        }
+
+        // Host can only view bookings belonging to them
+        if (!booking.host._id.equals(req.user._id)) {
+            req.flash(
+                "error",
+                "You are not allowed to view this booking."
+            );
+            return res.redirect("/host/bookings");
+        }
+
+        res.render("host/booking-details.ejs", {
+            booking
+        });
+
+    } catch (err) {
+        next(err);
     }
 };

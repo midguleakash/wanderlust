@@ -341,13 +341,113 @@ module.exports.myBookings = async (req, res, next) => {
         const bookings = await Booking.find({
             guest: req.user._id
         })
-        .populate("listing")
-        .populate("host")
-        .sort({ createdAt: -1 });
+            .populate("listing")
+            .populate("host")
+            .sort({ createdAt: -1 });
 
         res.render("booking/my-bookings.ejs", {
             bookings
         });
+
+    } catch (err) {
+        next(err);
+    }
+};
+
+
+module.exports.cancelBooking = async (req, res, next) => {
+    try {
+        const booking = await Booking.findById(req.params.id);
+
+        if (!booking) {
+            req.flash("error", "Booking not found!");
+            return res.redirect("/bookings/my");
+        }
+
+        // Only the guest who created the booking can cancel it
+        if (!booking.guest.equals(req.user._id)) {
+            req.flash("error", "You are not allowed to cancel this booking.");
+            return res.redirect("/bookings/my");
+        }
+
+        // Don't allow cancellation of already cancelled booking
+        if (booking.bookingStatus === "cancelled") {
+            req.flash("error", "This booking is already cancelled.");
+            return res.redirect(`/bookings/${booking._id}`);
+        }
+
+        // Don't allow cancellation after completion
+        if (booking.bookingStatus === "completed") {
+            req.flash("error", "Completed bookings cannot be cancelled.");
+            return res.redirect(`/bookings/${booking._id}`);
+        }
+
+        booking.bookingStatus = "cancelled";
+
+        await booking.save();
+
+        req.flash("success", "Booking cancelled successfully!");
+
+        res.redirect(`/bookings/${booking._id}`);
+
+    } catch (err) {
+        next(err);
+    }
+};
+
+
+module.exports.completeBooking = async (req, res, next) => {
+    try {
+        const booking = await Booking.findById(req.params.id);
+
+        if (!booking) {
+            req.flash("error", "Booking not found!");
+            return res.redirect("/host/bookings");
+        }
+
+        // Only the host of this booking can complete it
+        if (!booking.host.equals(req.user._id)) {
+            req.flash(
+                "error",
+                "You are not allowed to update this booking."
+            );
+            return res.redirect("/host/bookings");
+        }
+
+        if (booking.bookingStatus === "cancelled") {
+            req.flash(
+                "error",
+                "Cancelled booking cannot be completed."
+            );
+            return res.redirect(`/host/bookings/${booking._id}`);
+        }
+
+        if (booking.bookingStatus === "completed") {
+            req.flash(
+                "error",
+                "This booking is already completed."
+            );
+            return res.redirect(`/host/bookings/${booking._id}`);
+        }
+
+        if (booking.paymentStatus !== "paid") {
+            req.flash(
+                "error",
+                "Only paid bookings can be completed."
+            );
+            return res.redirect(`/host/bookings/${booking._id}`);
+        }
+
+        booking.bookingStatus = "completed";
+
+        await booking.save();
+
+        req.flash(
+            "success",
+            "Booking marked as completed successfully!"
+        );
+
+        res.redirect(`/host/bookings/${booking._id}`);
 
     } catch (err) {
         next(err);

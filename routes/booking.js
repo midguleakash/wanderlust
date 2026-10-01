@@ -42,6 +42,12 @@ router.get(
 );
 
 
+router.patch(
+    "/:id/cancel",
+    isGuest,
+    bookingController.cancelBooking
+);
+
 // =========================
 // BOOKING DETAILS
 // =========================

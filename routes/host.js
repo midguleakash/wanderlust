@@ -2,11 +2,12 @@ const express = require("express");
 const router = express.Router();
 
 const hostController = require("../controllers/host");
-const { isApprovedHost ,isHost } = require("../middleware/host");
+const { isApprovedHost, isHost } = require("../middleware/host");
 const multer = require("multer");
 const { storage } = require("../cloudConfig.js");
 const upload = multer({ storage });
-const {validateListing } = require("../middleware.js");
+const { validateListing } = require("../middleware.js");
+const bookingController = require("../controllers/booking.js");
 
 
 
@@ -43,6 +44,17 @@ router.get(
     hostController.bookings
 );
 
+router.get(
+    "/bookings/:id",
+    isApprovedHost,
+    hostController.showBooking
+);
+
+router.patch(
+    "/bookings/:id/complete",
+    isApprovedHost,
+    bookingController.completeBooking
+);
 
 
 router.get(
@@ -50,6 +62,8 @@ router.get(
     isApprovedHost,
     hostController.renderEditForm
 );
+
+
 
 router.put(
     "/listings/:id",
