@@ -62,3 +62,27 @@ module.exports.isReviewAuthor = async(req, res, next) => {
     }
     next()
 };
+
+
+module.exports.canViewListings = (req, res, next) => {
+
+    if (!req.isAuthenticated()) {
+        return next();
+    }
+
+    if (req.user.role === "guest") {
+        return next();
+    }
+
+    req.flash("error", "Only guests can view all listings.");
+    
+    if (req.user.role === "host") {
+        return res.redirect("/host/dashboard");
+    }
+
+    if (req.user.role === "admin" || req.user.role === "superadmin") {
+        return res.redirect("/admin/dashboard");
+    }
+
+    return res.redirect("/");
+};

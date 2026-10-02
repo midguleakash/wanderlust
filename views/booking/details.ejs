@@ -99,6 +99,17 @@
 
                             <% } %>
 
+
+                                <% if ( currentUser && currentUser.role==="guest" &&
+                                    booking.guest._id.equals(currentUser._id) && booking.paymentStatus==="pending" &&
+                                    booking.bookingStatus !=="cancelled" ) { %>
+
+                                    <a href="/bookings/<%= booking._id %>/pay" class="btn btn-success mt-3">
+                                        Pay Now ₹<%= booking.totalAmount %>
+                                    </a>
+
+                                    <% } %>
+
                     </div>
 
                 </div>

@@ -1,5 +1,7 @@
 const Listing = require("../models/listing.js");
 const Booking = require("../models/booking.js");
+const razorpay = require("../utils/razorpay.js");
+const crypto = require("crypto");
 
 
 // =========================
@@ -448,6 +450,124 @@ module.exports.completeBooking = async (req, res, next) => {
         );
 
         res.redirect(`/host/bookings/${booking._id}`);
+
+    } catch (err) {
+        next(err);
+    }
+};
+
+
+module.exports.createOrder = async (req, res, next) => {
+    try {
+        const booking = await Booking.findById(req.params.id);
+
+        if (!booking) {
+            req.flash("error", "Booking not found!");
+            return res.redirect("/bookings/my");
+        }
+
+        if (!booking.guest.equals(req.user._id)) {
+            req.flash("error", "You are not allowed to pay for this booking.");
+            return res.redirect("/bookings/my");
+        }
+
+        if (booking.paymentStatus === "paid") {
+            req.flash("error", "This booking is already paid.");
+            return res.redirect(`/bookings/${booking._id}`);
+        }
+
+        const options = {
+            amount: booking.totalAmount * 100,
+            currency: "INR",
+            receipt: `booking_${booking._id}`
+        };
+
+        const order = await razorpay.orders.create(options);
+
+        booking.razorpayOrderId = order.id;
+        await booking.save();
+
+        res.render("booking/payment.ejs", {
+            booking,
+            order,
+            razorpayKey: process.env.RAZORPAY_KEY_ID
+        });
+
+    } catch (err) {
+        next(err);
+    }
+};
+
+
+module.exports.verifyPayment = async (req, res, next) => {
+    try {
+        const booking = await Booking.findById(req.params.id);
+
+        if (!booking) {
+            return res.status(404).json({
+                success: false,
+                message: "Booking not found."
+            });
+        }
+
+        if (!booking.guest.equals(req.user._id)) {
+            return res.status(403).json({
+                success: false,
+                message: "You are not allowed to verify this payment."
+            });
+        }
+
+        const {
+            razorpay_payment_id,
+            razorpay_order_id,
+            razorpay_signature
+        } = req.body;
+
+        if (
+            !razorpay_payment_id ||
+            !razorpay_order_id ||
+            !razorpay_signature
+        ) {
+            return res.status(400).json({
+                success: false,
+                message: "Payment details are missing."
+            });
+        }
+
+        // Check that this Razorpay order belongs to this booking
+        if (booking.razorpayOrderId !== razorpay_order_id) {
+            return res.status(400).json({
+                success: false,
+                message: "Invalid Razorpay order."
+            });
+        }
+
+        const body =
+            razorpay_order_id + "|" + razorpay_payment_id;
+
+        const expectedSignature = crypto
+            .createHmac("sha256", process.env.RAZORPAY_KEY_SECRET)
+            .update(body)
+            .digest("hex");
+
+        if (expectedSignature !== razorpay_signature) {
+            return res.status(400).json({
+                success: false,
+                message: "Payment verification failed."
+            });
+        }
+
+        booking.razorpayPaymentId = razorpay_payment_id;
+        booking.paymentStatus = "paid";
+        booking.bookingStatus = "confirmed";
+
+        await booking.save();
+
+        return res.json({
+            success: true,
+            message: "Payment verified successfully.",
+            bookingId: booking._id
+        });
 
     } catch (err) {
         next(err);

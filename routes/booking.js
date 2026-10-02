@@ -52,6 +52,14 @@ router.patch(
 // BOOKING DETAILS
 // =========================
 
+router.get("/:id/pay", isGuest, bookingController.createOrder);
+
+router.post(
+    "/:id/payment/verify",
+    isGuest,
+    bookingController.verifyPayment
+);
+
 router.get(
     "/:id",
     isLoggedIn,
