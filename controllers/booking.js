@@ -2,6 +2,8 @@ const Listing = require("../models/listing.js");
 const Booking = require("../models/booking.js");
 const razorpay = require("../utils/razorpay.js");
 const crypto = require("crypto");
+const { sendEmail } = require("../services/emailService.js");
+const generateBookingPDF = require("../utils/generateBookingPDF.js");
 
 
 // =========================
@@ -562,6 +564,155 @@ module.exports.verifyPayment = async (req, res, next) => {
         booking.bookingStatus = "confirmed";
 
         await booking.save();
+
+
+        // ========================================
+        // GET COMPLETE BOOKING DETAILS
+        // ========================================
+
+        const confirmedBooking = await Booking
+            .findById(booking._id)
+            .populate("listing")
+            .populate("guest")
+            .populate("host");
+
+
+        // ========================================
+        // GENERATE BOOKING PDF
+        // ========================================
+
+        try {
+
+            const pdfBuffer =
+                await generateBookingPDF(confirmedBooking);
+
+            const pdfBase64 =
+                pdfBuffer.toString("base64");
+
+
+            // ========================================
+            // SEND CONFIRMATION EMAIL
+            // ========================================
+
+            await sendEmail({
+                to: confirmedBooking.guest.email,
+
+                subject:
+                    `Booking Confirmed - ${confirmedBooking.listing.title}`,
+
+                html: `
+            <div style="font-family: Arial, sans-serif;">
+
+                <h2>Booking Confirmed 🎉</h2>
+
+                <p>
+                    Hello
+                    <strong>
+                        ${confirmedBooking.guest.username}
+                    </strong>,
+                </p>
+
+                <p>
+                    Your booking has been successfully
+                    confirmed and your payment has been received.
+                </p>
+
+                <h3>Booking Details</h3>
+
+                <p>
+                    <strong>Property:</strong>
+                    ${confirmedBooking.listing.title}
+                </p>
+
+                <p>
+                    <strong>Location:</strong>
+                    ${confirmedBooking.listing.location},
+                    ${confirmedBooking.listing.country}
+                </p>
+
+                <p>
+                    <strong>Check-in:</strong>
+                    ${new Date(
+                    confirmedBooking.checkIn
+                ).toLocaleDateString("en-IN")}
+                </p>
+
+                <p>
+                    <strong>Check-out:</strong>
+                    ${new Date(
+                    confirmedBooking.checkOut
+                ).toLocaleDateString("en-IN")}
+                </p>
+
+                <p>
+                    <strong>Guests:</strong>
+                    ${confirmedBooking.guests}
+                </p>
+
+                <p>
+                    <strong>Nights:</strong>
+                    ${confirmedBooking.nights}
+                </p>
+
+                <p>
+                    <strong>Total Amount:</strong>
+                    ₹${confirmedBooking.totalAmount}
+                </p>
+
+                <p>
+                    <strong>Payment Status:</strong>
+                    Paid
+                </p>
+
+                <p>
+                    <strong>Booking Status:</strong>
+                    Confirmed
+                </p>
+
+                <hr>
+
+                <p>
+                    Your booking confirmation PDF is
+                    attached to this email.
+                </p>
+
+                <p>
+                    Thank you for choosing Wanderlust!
+                </p>
+
+            </div>
+        `,
+
+                attachments: [
+                    {
+                        filename:
+                            `Wanderlust-Booking-${confirmedBooking._id}.pdf`,
+
+                        content: pdfBase64,
+
+                        contentType: "application/pdf"
+                    }
+                ]
+            });
+
+            console.log(
+                "Booking confirmation email sent to:",
+                confirmedBooking.guest.email
+            );
+
+        } catch (emailError) {
+
+            // Email failure should NOT cancel the booking
+            console.error(
+                "Booking confirmation email failed:",
+                emailError.message
+            );
+        }
+
+
+        // ========================================
+        // RESPONSE
+        // ========================================
 
         return res.json({
             success: true,
