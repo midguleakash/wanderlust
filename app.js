@@ -106,7 +106,7 @@ app.use("/listings" , listingRouter);
 app.use("/listings/:id/reviews" , reviewRouter);
 app.use("/" , userRouter);
 app.use("/host", hostRouter);
-app.use("/admin", adminRouter);
+app.use("/admin", adminRouter); 
 app.use("/profile", profileRouter);
 app.use("/bookings", bookingRouter);
 
